@@ -18,10 +18,11 @@ const Home = {
 
   // ── WALLETS ────────────────────────────────
   renderWallets() {
-    const row = document.getElementById('wallet-row');
-    if (!row) return;
+    const wrap = document.getElementById('wallet-section-wrap');
+    if (!wrap) return;
     const wallets = DB.data.settings.wallets;
-    let html = wallets.map((w, i) => {
+    const total   = wallets.reduce((s, w) => s + DB.walletBalance(w.id), 0);
+    const cards   = wallets.map(w => {
       const bal = DB.walletBalance(w.id);
       return `<div class="w-card ${w.color}" onclick="Ledger.filterWallet('${w.id}')">
         <div class="w-icon">${w.icon}</div>
@@ -29,13 +30,23 @@ const Home = {
         <div class="w-amt">${U.fmtShort(bal)}</div>
       </div>`;
     }).join('');
-    const total = wallets.reduce((s, w) => s + DB.walletBalance(w.id), 0);
-    html += `<div class="w-total">
-      <div class="w-icon">∑</div>
-      <div class="w-lbl">Total</div>
-      <div class="w-amt">${U.fmtShort(total)}</div>
-    </div>`;
-    row.innerHTML = html;
+    wrap.innerHTML = `
+      <div style="display:flex;align-items:stretch;gap:8px;margin-bottom:12px;overflow:hidden">
+        <div class="wallet-scroll" style="flex:1;margin-bottom:0">${cards}</div>
+        <button onclick="Entry.open('xfr')"
+          style="background:var(--blue-s);border:1px solid var(--blue-g);color:var(--blue);
+                 border-radius:var(--r-m);padding:6px 10px;font-size:10px;font-weight:700;
+                 letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+                 display:flex;flex-direction:column;align-items:center;justify-content:center;
+                 gap:3px;flex-shrink:0;min-width:58px;min-height:72px">
+          <span style="font-size:18px">&#128260;</span>Transfer
+        </button>
+        <div class="w-total" style="flex-shrink:0;min-width:88px;margin-bottom:0">
+          <div class="w-icon">&#8721;</div>
+          <div class="w-lbl">Total</div>
+          <div class="w-amt">${U.fmtShort(total)}</div>
+        </div>
+      </div>`;
   },
 
   // ── MONTH SUMMARY ──────────────────────────

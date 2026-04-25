@@ -58,23 +58,41 @@ const Home = {
     const inn = txns.filter(t => t.type === 'in').reduce((s, t) => s + t.amount, 0);
     const out = txns.filter(t => t.type === 'out').reduce((s, t) => s + t.amount, 0);
     const net = inn - out;
-    const now = new Date();
-    const label = now.toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
+    const label = new Date().toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
     el.innerHTML = `
-      <div class="sum-item" onclick="Home.showMonthList('in')">
-        <div class="sum-lbl">Cash In</div>
-        <div class="sum-val g">${U.fmtShort(inn)}</div>
-        <div style="font-size:9px;color:var(--txt-3);margin-top:2px">${label}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+
+        <!-- Cash In — action button -->
+        <button onclick="Entry.open('in')"
+          style="background:var(--green-s);border:1px solid var(--green-g);border-radius:var(--r-l);
+                 padding:14px 10px;cursor:pointer;text-align:center;transition:all .18s;width:100%"
+          onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--green-g)'">
+          <div style="font-size:22px;margin-bottom:4px">💰</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:4px">Cash In</div>
+          <div style="font-family:var(--fm);font-size:16px;font-weight:600;color:var(--green)">${U.fmtShort(inn)}</div>
+          <div style="font-size:9px;color:var(--txt-3);margin-top:2px">${label} · tap to add</div>
+        </button>
+
+        <!-- Cash Out — action button -->
+        <button onclick="Entry.open('out')"
+          style="background:var(--red-s);border:1px solid var(--red-g);border-radius:var(--r-l);
+                 padding:14px 10px;cursor:pointer;text-align:center;transition:all .18s;width:100%"
+          onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--red-g)'">
+          <div style="font-size:22px;margin-bottom:4px">💸</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:4px">Cash Out</div>
+          <div style="font-family:var(--fm);font-size:16px;font-weight:600;color:var(--red)">${U.fmtShort(out)}</div>
+          <div style="font-size:9px;color:var(--txt-3);margin-top:2px">${label} · tap to add</div>
+        </button>
+
       </div>
-      <div class="sum-item" onclick="Home.showMonthList('out')">
-        <div class="sum-lbl">Cash Out</div>
-        <div class="sum-val r">${U.fmtShort(out)}</div>
-        <div style="font-size:9px;color:var(--txt-3);margin-top:2px">${label}</div>
-      </div>
-      <div class="sum-item" onclick="Home.showMonthList('all')">
-        <div class="sum-lbl">Net</div>
-        <div class="sum-val ${net >= 0 ? 'g' : 'r'}">${U.fmtShort(net)}</div>
-        <div style="font-size:9px;color:var(--txt-3);margin-top:2px">${label}</div>
+
+      <!-- Net summary bar -->
+      <div onclick="Home.showMonthList('all')"
+        style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-m);
+               padding:10px 14px;display:flex;justify-content:space-between;align-items:center;
+               cursor:pointer;margin-bottom:12px">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-3)">Net ${label}</span>
+        <span style="font-family:var(--fm);font-size:15px;font-weight:600" class="${net >= 0 ? 'g' : 'r'}">${net >= 0 ? '+' : ''}${U.fmtShort(net)}</span>
       </div>`;
   },
 

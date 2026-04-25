@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1f0e"/>
+      <stop offset="100%" style="stop-color:#0a1628"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2ea84f"/>
+      <stop offset="100%" style="stop-color:#1f6feb"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#accent)" stroke-width="2" opacity="0.3"/>
+
+  <!-- House/Oikos symbol — stylized as a minimalist roof + pillars -->
+  <!-- Roof triangle -->
+  <polygon points="256,100 370,210 142,210" fill="none" stroke="url(#accent)" stroke-width="6" stroke-linejoin="round" filter="url(#glow)"/>
+
+  <!-- Center dot on roof peak -->
+  <circle cx="256" cy="100" r="8" fill="#2ea84f" filter="url(#glow)"/>
+
+  <!-- Left pillar -->
+  <rect x="168" y="210" width="12" height="140" fill="url(#accent)" rx="2"/>
+  <!-- Right pillar -->
+  <rect x="332" y="210" width="12" height="140" fill="url(#accent)" rx="2"/>
+  <!-- Center pillar (slightly taller accent) -->
+  <rect x="250" y="210" width="12" height="140" fill="#2ea84f" rx="2" filter="url(#glow)"/>
+
+  <!-- Base line -->
+  <rect x="142" y="348" width="228" height="8" fill="url(#accent)" rx="4"/>
+
+  <!-- Coin / growth arc below -->
+  <path d="M 180 390 Q 256 430 332 390" fill="none" stroke="#1f6feb" stroke-width="3" opacity="0.7"/>
+
+  <!-- Greek Ω symbol subtle watermark -->
+  <text x="256" y="490" font-family="serif" font-size="28" fill="white" opacity="0.15" text-anchor="middle" font-style="italic">οἶκος</text>
+</svg>

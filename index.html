@@ -109,7 +109,7 @@
     <!-- ══ HOME ══ -->
     <div class="page active" id="page-home">
       <div id="home-quote"></div>
-      <div class="wallet-scroll" id="wallet-row"></div>
+      <div id="wallet-section-wrap"></div>
       <div class="sum3" id="home-sum3"></div>
       <div id="weekly-section"></div>
       <div id="home-warnings"></div>
@@ -277,8 +277,23 @@
     </div>
   </div>
 
-  <!-- FAB -->
-  <button class="fab" onclick="Entry.open()" id="main-fab">+</button>
+  <!-- CASH IN / OUT BUTTONS -->
+  <div id="main-actions" style="position:fixed;bottom:calc(var(--nav)+12px);right:14px;display:flex;flex-direction:column;gap:8px;z-index:20">
+    <button onclick="Entry.open('in')"
+      style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-d));
+             color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer;
+             display:flex;flex-direction:column;align-items:center;justify-content:center;
+             gap:1px;box-shadow:0 4px 16px var(--green-g);line-height:1">
+      <span style="font-size:16px">💰</span>IN
+    </button>
+    <button onclick="Entry.open('out')"
+      style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#c04040,#8b1a1a);
+             color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer;
+             display:flex;flex-direction:column;align-items:center;justify-content:center;
+             gap:1px;box-shadow:0 4px 16px var(--red-g);line-height:1">
+      <span style="font-size:16px">💸</span>OUT
+    </button>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -307,16 +322,27 @@
       style="font-size:22px;font-family:var(--fm)" oninput="Entry.onAmountChange()"/>
   </div>
 
-  <div class="field" id="e-wallet-field">
-    <div class="field-label" id="e-wallet-label">Pay From</div>
-    <select id="e-wallet"></select>
+  <!-- Cash In / Out: single wallet chip selector -->
+  <div id="e-cash-wallet-wrap">
+    <div class="field-label" id="e-cash-wallet-label"
+      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
+      Pay from
+    </div>
+    <div class="chip-grid" id="e-cash-wallet-chips" style="margin-bottom:12px"></div>
   </div>
 
-  <div id="e-to-wallet-wrap" style="display:none">
-    <div class="field">
-      <div class="field-label">To Wallet</div>
-      <select id="e-to-wallet"></select>
+  <!-- Transfer: from + to wallet chip selectors -->
+  <div id="e-xfr-wallet-wrap" style="display:none">
+    <div class="field-label"
+      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
+      From Wallet
     </div>
+    <div class="chip-grid" id="e-wallet-chips" style="margin-bottom:10px"></div>
+    <div class="field-label"
+      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
+      To Wallet
+    </div>
+    <div class="chip-grid" id="e-to-wallet-chips" style="margin-bottom:12px"></div>
   </div>
 
   <div id="e-cat-wrap">
@@ -688,7 +714,7 @@ const App = {
     if (ni) ni.classList.add('active');
     this._currentPage = page;
     const fab = document.getElementById('main-fab');
-    if (fab) fab.style.display = page === 'settings' ? 'none' : 'flex';
+    const ma = document.getElementById('main-actions'); if (ma) ma.style.display = page === 'settings' ? 'none' : 'flex';
     if (page === 'home')     Home.render();
     if (page === 'ledger')   Ledger.render();
     if (page === 'charts')   Charts.render();

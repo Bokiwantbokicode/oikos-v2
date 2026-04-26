@@ -1,6 +1,6 @@
 // ── OIKOS v2 · sw.js ─────────────────────────
 // Cache version — bump this number on every deploy to force refresh
-const VERSION = 'oikos-v2-4';
+const VERSION = 'oikos-v2-5';
 
 // On install — skip waiting immediately so new SW takes over fast
 self.addEventListener('install', () => {

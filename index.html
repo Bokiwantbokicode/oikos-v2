@@ -1,773 +1,1199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<meta name="theme-color" content="#080c0f"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Oikos"/>
-<meta name="application-name" content="Oikos"/>
-<link rel="manifest" href="manifest.json"/>
-<link rel="apple-touch-icon" href="assets/icon-192.png"/>
-<title>Oikos — Personal Economy</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="css/main.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GRIP SOCIAL V8</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#e8ff47">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GRIP">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;--s1:#13131a;--s2:#1c1c28;--s3:#252535;
+  --accent:#e8ff47;--a3:#7b61ff;
+  --text:#f0f0f0;--muted:#5a5a72;--border:#2a2a3a;--border2:#35354a;
+  --green:#39ff8a;--red:#ff4757;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;height:100dvh;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 5%,rgba(123,97,255,.07) 0%,transparent 55%),radial-gradient(ellipse at 85% 95%,rgba(232,255,71,.04) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* NAV */
+.main-nav{position:relative;z-index:10;display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.nav-tab{flex:1;padding:13px 0 11px;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:color .2s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* PAGES */
+.page{flex:1;display:none;flex-direction:column;min-height:0;overflow:hidden;}
+.page.active{display:flex;}
+
+/* ══ COACH ══ */
+.coach-header{position:relative;z-index:10;padding:12px 16px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:var(--accent);line-height:1;}
+.logo sub{font-family:'DM Sans',sans-serif;font-size:9px;font-weight:300;letter-spacing:2px;color:var(--muted);display:block;}
+.header-pills{display:flex;gap:6px;align-items:center;}
+.pill{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:5px 10px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer;}
+.icon-btn{background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.icon-btn:active{border-color:var(--accent);}
+
+.selectors{padding:8px 16px 0;display:flex;gap:8px;flex-shrink:0;position:relative;z-index:10;}
+.sel-wrap{flex:1;position:relative;}
+.sel-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:11px;pointer-events:none;}
+select{width:100%;padding:8px 26px 8px 11px;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;appearance:none;cursor:pointer;outline:none;}
+select:focus{border-color:var(--accent);}
+
+.mode-tabs{padding:8px 16px 6px;display:flex;gap:5px;flex-shrink:0;position:relative;z-index:10;}
+.tab{flex:1;padding:8px 0;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#000;}
+.tab:active{transform:scale(.96);}
+
+/* CARD */
+.card-wrap{flex:1;padding:0 16px;display:flex;flex-direction:column;min-height:0;}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:18px 18px 14px;flex:1;display:flex;flex-direction:column;min-height:0;position:relative;overflow:hidden;cursor:grab;user-select:none;}
+.card:active{cursor:grabbing;}
+.card::before{content:'';position:absolute;top:-40px;left:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(232,255,71,.06) 0%,transparent 70%);pointer-events:none;}
+
+@keyframes cardIn{from{transform:scale(.97) translateY(5px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.card.anim{animation:cardIn .22s cubic-bezier(.34,1.56,.64,1) both;}
+
+.card-tag{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.card-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0;}
+
+.phrase-tip{font-size:12px;color:var(--muted);line-height:1.5;font-style:italic;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:12px;flex-shrink:0;}
+
+.phrase-main{font-size:20px;line-height:1.42;font-weight:500;color:var(--text);flex:1;overflow-y:auto;scrollbar-width:none;}
+.phrase-main::-webkit-scrollbar{display:none;}
+
+.phrase-chain{margin-top:10px;flex-shrink:0;border-top:1px solid var(--border);padding-top:10px;}
+.chain-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;}
+.chain-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);flex-shrink:0;padding-top:2px;min-width:44px;}
+.chain-text{font-size:13px;color:var(--muted);line-height:1.4;}
+
+.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-shrink:0;}
+.card-ctx{font-size:11px;color:var(--muted);background:var(--s2);border-radius:6px;padding:3px 8px;}
+.saved-ind{font-size:11px;font-weight:600;color:var(--accent);opacity:0;transition:opacity .3s;}
+.saved-ind.on{opacity:1;}
+.swipe-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted);letter-spacing:1.5px;opacity:.3;white-space:nowrap;pointer-events:none;}
+
+.speak-fab{position:absolute;top:14px;right:14px;background:var(--s2);border:1px solid var(--border2);color:var(--muted);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;z-index:5;transition:all .2s;}
+.speak-fab:active{border-color:var(--accent);color:var(--accent);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+.speak-fab.on{border-color:var(--accent);color:var(--accent);animation:blink 1s infinite;}
+
+.actions{position:relative;z-index:10;display:flex;gap:7px;padding:7px 16px 5px;flex-shrink:0;}
+.btn{flex:1;padding:12px 0;border:none;border-radius:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.btn:active{transform:scale(.95);}
+.btn-prev{background:var(--s1);color:var(--muted);border:1px solid var(--border);}
+.btn-next{background:var(--s1);color:var(--muted);border:1px solid var(--border);}
+.btn-star{background:var(--accent);color:#000;font-weight:700;flex:1.3;}
+
+/* FAV PANEL */
+.panel{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.panel.open{transform:translateX(0);}
+.panel-header{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+.panel-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--accent);}
+.close-btn{background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;}
+.fav-list{flex:1;overflow-y:auto;padding:10px 16px;display:flex;flex-direction:column;gap:7px;-webkit-overflow-scrolling:touch;}
+.fav-item{background:var(--s1);border:1px solid var(--border);border-radius:13px;padding:13px 15px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.fav-phrase{font-size:14px;line-height:1.4;}
+.fav-meta{font-size:10px;color:var(--muted);margin-top:3px;}
+.fav-btns{display:flex;gap:5px;flex-shrink:0;}
+.fav-speak,.fav-del{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:13px;padding:4px 7px;border-radius:6px;}
+.fav-speak:active{border-color:var(--accent);color:var(--accent);}
+.fav-del:active{border-color:var(--red);color:var(--red);}
+.fav-empty{text-align:center;color:var(--muted);margin-top:60px;font-size:13px;line-height:1.8;}
+.fav-empty span{font-size:32px;display:block;margin-bottom:10px;}
+
+/* ══ KEYWORD BOARD ══ */
+.kb-output{flex-shrink:0;padding:10px 16px 8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px;position:relative;z-index:10;}
+.kb-display{min-height:52px;padding:10px 12px;background:var(--s1);border:1px solid var(--border);border-radius:12px;display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px;}
+.kb-chip-out{display:inline-flex;flex-direction:column;align-items:center;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 8px;line-height:1.2;}
+.kb-chip-out .kco-native{font-size:14px;font-weight:600;color:var(--accent);}
+.kb-chip-out .kco-en{font-size:10px;color:var(--muted);}
+.kb-placeholder{font-size:13px;color:var(--muted);font-style:italic;align-self:center;}
+.kb-actions-row{display:flex;gap:6px;}
+.kb-btn{flex:1;padding:9px 0;background:var(--s1);border:1px solid var(--border);border-radius:11px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;}
+.kb-btn:active{transform:scale(.95);}
+.kb-btn.speak{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+.kb-btn.clr{color:var(--red);border-color:rgba(255,71,87,.2);}
+
+/* section tabs */
+.kb-sections{flex-shrink:0;display:flex;gap:4px;padding:8px 16px 6px;position:relative;z-index:10;overflow-x:auto;scrollbar-width:none;}
+.kb-sections::-webkit-scrollbar{display:none;}
+.sec-tab{flex-shrink:0;padding:7px 12px;background:var(--s1);border:1px solid var(--border);border-radius:9px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.sec-tab.active{background:var(--s2);border-color:var(--border2);color:var(--text);}
+.sec-tab:active{transform:scale(.96);}
+
+/* word grid */
+.kb-grid-wrap{flex:1;overflow-y:auto;padding:4px 16px 12px;-webkit-overflow-scrolling:touch;}
+.kb-section{display:none;}
+.kb-section.active{display:block;}
+.sec-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:10px 0 7px;font-weight:600;}
+.word-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.word-chip{padding:8px 13px;background:var(--s1);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.word-chip:active{transform:scale(.92);background:var(--s2);border-color:var(--accent);}
+.chip-en{font-size:13px;font-weight:500;color:var(--text);}
+.chip-tl{font-size:10px;color:var(--muted);font-weight:300;}
+
+/* TOAST */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:500;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.acc{background:var(--accent);color:#000;border-color:var(--accent);}
+
+.bot-pad{height:8px;flex-shrink:0;}
+</style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════
-     ONBOARDING
-     ═══════════════════════════════════ -->
-<div class="ob-wrap" id="onboarding">
-  <div class="ob-logo">O<em>I</em>KOS</div>
-  <div class="ob-tagline">οἶκος · Personal Economy</div>
-
-  <div class="ob-step active" id="ob-1">
-    <div class="ob-q">What should we call you?</div>
-    <div class="field">
-      <input id="ob-name" type="text" placeholder="Your name…"
-        style="text-align:center;font-size:20px;font-family:var(--fd);letter-spacing:.1em"/>
-    </div>
-    <button class="btn btn-g" onclick="Ob.next(1)">Continue →</button>
-  </div>
-
-  <div class="ob-step" id="ob-2">
-    <div class="ob-q">Monthly income target</div>
-    <div class="field">
-      <input id="ob-income" type="number" placeholder="45000" inputmode="decimal"
-        style="text-align:center;font-size:24px;font-family:var(--fm)"/>
-    </div>
-    <div style="font-size:12px;color:var(--txt-3);margin-bottom:14px">Editable anytime in Settings</div>
-    <button class="btn btn-g" onclick="Ob.next(2)">Continue →</button>
-  </div>
-
-  <div class="ob-step" id="ob-3">
-    <div class="ob-q">Name your wallets</div>
-    <div class="field"><div class="field-label">💳 E-Wallet (GCash, Maya…)</div>
-      <input id="ob-w1" type="text" placeholder="GCash"/>
-    </div>
-    <div class="field"><div class="field-label">🏦 Bank Account</div>
-      <input id="ob-w2" type="text" placeholder="BDO"/>
-    </div>
-    <div class="field"><div class="field-label">👛 Physical Cash</div>
-      <input id="ob-w3" type="text" placeholder="Wallet"/>
-    </div>
-    <button class="btn btn-g" onclick="Ob.next(3)">Continue →</button>
-  </div>
-
-  <div class="ob-step" id="ob-4">
-    <div class="ob-q">Current balances</div>
-    <div style="font-size:12px;color:var(--txt-2);margin-bottom:14px">How much is in each wallet right now?</div>
-    <div class="field"><div class="field-label" id="ob-bal1-lbl">💳 E-Wallet</div>
-      <input id="ob-bal1" type="number" placeholder="0" inputmode="decimal"
-        style="font-family:var(--fm);font-size:16px"/>
-    </div>
-    <div class="field"><div class="field-label" id="ob-bal2-lbl">🏦 Bank</div>
-      <input id="ob-bal2" type="number" placeholder="0" inputmode="decimal"
-        style="font-family:var(--fm);font-size:16px"/>
-    </div>
-    <div class="field"><div class="field-label" id="ob-bal3-lbl">👛 Cash</div>
-      <input id="ob-bal3" type="number" placeholder="0" inputmode="decimal"
-        style="font-family:var(--fm);font-size:16px"/>
-    </div>
-    <button class="btn btn-g" onclick="Ob.finish()">Enter Oikos →</button>
-  </div>
-
-  <div class="ob-dots" id="ob-dots">
-    <div class="ob-dot active"></div>
-    <div class="ob-dot"></div>
-    <div class="ob-dot"></div>
-    <div class="ob-dot"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════
-     APP SHELL
-     ═══════════════════════════════════ -->
-<div id="app" style="display:none">
-
-  <!-- HEADER -->
-  <div class="hdr">
-    <div>
-      <div class="hdr-logo">O<em>I</em>KOS</div>
-    </div>
-    <div class="hdr-right">
-      <div class="hdr-sync">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-lbl"></span>
-      </div>
-      <div class="ico-btn" id="search-btn" onclick="App.openSearch()" title="Search">🔍</div>
-      <div class="ico-btn" onclick="App.navTo('settings')" title="Settings">⚙️</div>
-    </div>
-  </div>
-
-  <!-- PAGES -->
-  <div class="pages">
-
-    <!-- ══ HOME ══ -->
-    <div class="page active" id="page-home">
-      <div id="home-quote"></div>
-      <div id="wallet-section-wrap"></div>
-      <div class="sum3" id="home-sum3"></div>
-      <div id="weekly-section"></div>
-      <div id="home-warnings"></div>
-      <div id="home-insight"></div>
-      <div class="card">
-        <div class="sec-hdr">
-          <span class="card-title" style="margin:0">Recent Activity</span>
-          <span class="sec-act" onclick="App.navTo('ledger')">All →</span>
-        </div>
-        <div id="home-activity"></div>
-      </div>
-    </div>
-
-    <!-- ══ LEDGER ══ -->
-    <div class="page" id="page-ledger">
-      <div class="tabs">
-        <div class="tab active" onclick="Ledger.switchTab('txn')">Transactions</div>
-        <div class="tab" onclick="Ledger.switchTab('people')">People</div>
-        <div class="tab" onclick="Ledger.switchTab('goals')">Goals</div>
-      </div>
-
-      <!-- TXN TAB -->
-      <div id="ltab-txn">
-        <div class="search-bar">
-          <span class="s-ico">🔍</span>
-          <input id="txn-search" type="text" placeholder="Search transactions…" oninput="Ledger.renderTxns()"/>
-          <button class="s-clr" onclick="document.getElementById('txn-search').value='';Ledger.renderTxns()">×</button>
-        </div>
-        <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center">
-          <div class="field" style="flex:1;margin:0">
-            <input type="date" id="date-from" style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-m);padding:7px 10px;width:100%;font-size:12px;color:var(--txt)" onchange="Ledger.renderTxns()" placeholder="From"/>
-          </div>
-          <span style="color:var(--txt-3);font-size:12px">→</span>
-          <div class="field" style="flex:1;margin:0">
-            <input type="date" id="date-to" style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-m);padding:7px 10px;width:100%;font-size:12px;color:var(--txt)" onchange="Ledger.renderTxns()" placeholder="To"/>
-          </div>
-          <button class="btn btn-ghost btn-sm" onclick="Ledger.clearDateFilter()">Clear</button>
-        </div>
-        <div id="wallet-filter-badge" style="display:none;margin-bottom:8px">
-          <span class="chip on" onclick="Ledger.clearWalletFilter()" id="wallet-filter-badge"></span>
-        </div>
-        <div id="txn-list"></div>
-      </div>
-
-      <!-- PEOPLE TAB -->
-      <div id="ltab-people" style="display:none">
-        <button class="btn btn-ghost" style="margin-bottom:10px;font-size:13px" onclick="Ledger.openAddPerson()">+ Add Person</button>
-        <div id="people-list"></div>
-      </div>
-
-      <!-- GOALS TAB -->
-      <div id="ltab-goals" style="display:none">
-        <div class="tabs">
-          <div class="tab active" onclick="Ledger.switchGoalsView('list')">List</div>
-          <div class="tab" onclick="Ledger.switchGoalsView('calendar')">Calendar</div>
-        </div>
-        <button class="btn btn-ghost" style="margin-bottom:10px;font-size:13px" onclick="Ledger.openAddGoal()">+ Add Goal / Anticipated Expense</button>
-        <div id="goals-content"></div>
-      </div>
-    </div>
-
-    <!-- ══ CHARTS ══ -->
-    <div class="page" id="page-charts">
-      <div class="tabs">
-        <div class="tab active" onclick="Charts.switchTab('monthly')">Monthly</div>
-        <div class="tab" onclick="Charts.switchTab('weekly')">Weekly</div>
-        <div class="tab" onclick="Charts.switchTab('daily')">Daily</div>
-      </div>
-      <div id="charts-content"></div>
-    </div>
-
-    <!-- ══ MIND ══ -->
-    <div class="page" id="page-mind">
-      <div class="tabs">
-        <div class="tab active" onclick="Mind.switchTab('focus')">Focus</div>
-        <div class="tab" onclick="Mind.switchTab('journal')">Journal</div>
-        <div class="tab" onclick="Mind.switchTab('vault')">Vault</div>
-      </div>
-      <div id="mind-content"></div>
-    </div>
-
-    <!-- ══ SETTINGS ══ -->
-    <div class="page" id="page-settings">
-      <div style="font-family:var(--fd);font-size:12px;letter-spacing:.14em;color:var(--txt-3);margin-bottom:14px;text-transform:uppercase">Configuration</div>
-
-      <div class="card">
-        <div class="card-title">Profile</div>
-        <div class="set-item">
-          <span class="set-lbl">Your Name</span>
-          <input id="cfg-name" type="text" style="background:transparent;color:var(--txt);font-size:13px;text-align:right;width:150px;border:none;outline:none" onchange="Settings.save('userName',this.value)"/>
-        </div>
-        <div class="set-item">
-          <span class="set-lbl">Monthly Income Target</span>
-          <input id="cfg-income" type="number" style="background:transparent;color:var(--green);font-family:var(--fm);font-size:13px;text-align:right;width:100px;border:none;outline:none" onchange="Settings.save('monthlyIncome',+this.value)"/>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Wallets</div>
-        <div id="wallet-editor"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Expense Categories</div>
-        <div id="cat-editor"></div>
-        <button class="btn btn-ghost" style="margin-top:8px;font-size:13px" onclick="Settings.addCat()">+ Add Category</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">GitHub Sync</div>
-        <div class="field"><div class="field-label">Personal Access Token</div>
-          <input id="cfg-token" type="password" placeholder="ghp_…" onchange="Settings.save('ghToken',this.value)"/>
-        </div>
-        <div class="field"><div class="field-label">Repository (owner/repo)</div>
-          <input id="cfg-repo" type="text" placeholder="username/oikos-data" onchange="Settings.save('ghRepo',this.value)"/>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="Settings.testGitHub()">Test Connection</button>
-          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="Settings.syncNow()">Sync Now</button>
-        </div>
-        <div style="font-size:11px;color:var(--txt-3)" id="last-sync-lbl"></div>
-        <div class="set-item" style="margin-top:10px">
-          <div>
-            <div class="set-lbl">Sync Journal & Vault</div>
-            <div style="font-size:11px;color:var(--txt-3)">Off = stays local only</div>
-          </div>
-          <div class="toggle" id="cfg-journal-toggle" onclick="Settings.toggleJournalSync()"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Data</div>
-        <div class="set-item">
-          <span class="set-lbl">Export CSV</span>
-          <button class="btn btn-ghost btn-sm" onclick="Settings.exportCSV()">Export</button>
-        </div>
-        <div class="set-item">
-          <span class="set-lbl">Export JSON</span>
-          <button class="btn btn-ghost btn-sm" onclick="Settings.exportJSON()">Export</button>
-        </div>
-        <div class="set-item">
-          <span class="set-lbl" style="color:var(--red)">Clear All Data</span>
-          <button class="btn btn-r btn-sm" onclick="Settings.clearData()">Clear</button>
-        </div>
-      </div>
-
-      <div style="text-align:center;font-size:11px;color:var(--txt-3);margin-top:20px;font-family:var(--fd);letter-spacing:.12em">OIKOS v2 · οἶκος</div>
-    </div>
-
-  </div><!-- /pages -->
-
-  <!-- BOTTOM NAV -->
-  <div class="nav">
-    <div class="nav-i active" id="nav-home" onclick="App.navTo('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
-    </div>
-    <div class="nav-i" id="nav-ledger" onclick="App.navTo('ledger')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Ledger
-    </div>
-    <div class="nav-i" id="nav-charts" onclick="App.navTo('charts')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Charts
-    </div>
-    <div class="nav-i" id="nav-mind" onclick="App.navTo('mind')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Mind
-    </div>
-  </div>
-
-  <!-- No FAB: Cash In/Out are in the summary cards -->
-</div>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════════════════════════════
-     MODALS
-     ═══════════════════════════════════ -->
-
-<!-- ENTRY -->
-<div class="overlay" id="entry-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('entry-overlay')">×</div>
-  <div class="m-title" id="entry-title">New Entry</div>
-
-  <div class="type-sel">
-    <div class="type-btn sel-out" data-type="out" onclick="Entry.setType('out')"><span class="ti">💸</span>Cash Out</div>
-    <div class="type-btn" data-type="in"  onclick="Entry.setType('in')"><span class="ti">💰</span>Cash In</div>
-    <div class="type-btn" data-type="xfr" onclick="Entry.setType('xfr')"><span class="ti">🔄</span>Transfer</div>
+<!-- FAV PANEL -->
+<div class="panel" id="favPanel">
+  <div class="panel-header">
+    <div class="panel-title">⭐ SAVED</div>
+    <button class="close-btn" onclick="closeFavs()">✕ Close</button>
   </div>
+  <div class="fav-list" id="favList"></div>
+</div>
 
-  <div class="field">
-    <div class="field-label">Amount (₱)</div>
-    <input id="e-amount" type="number" placeholder="0.00" inputmode="decimal"
-      style="font-size:22px;font-family:var(--fm)" oninput="Entry.onAmountChange()"/>
-  </div>
+<!-- MAIN NAV -->
+<div class="main-nav">
+  <button class="nav-tab active" id="navCoach" onclick="switchPage('coach')">🎯 Coach</button>
+  <button class="nav-tab" id="navBoard" onclick="switchPage('board')">🗣️ Board</button>
+</div>
 
-  <!-- Cash In / Out: single wallet chip selector -->
-  <div id="e-cash-wallet-wrap">
-    <div class="field-label" id="e-cash-wallet-label"
-      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
-      Pay from
-    </div>
-    <div class="chip-grid" id="e-cash-wallet-chips" style="margin-bottom:12px"></div>
-  </div>
+<!-- ══════════════════ COACH PAGE ══════════════════ -->
+<div class="page active" id="pageCoach">
 
-  <!-- Transfer: from + to wallet chip selectors -->
-  <div id="e-xfr-wallet-wrap" style="display:none">
-    <div class="field-label"
-      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
-      From Wallet
-    </div>
-    <div class="chip-grid" id="e-wallet-chips" style="margin-bottom:10px"></div>
-    <div class="field-label"
-      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
-      To Wallet
-    </div>
-    <div class="chip-grid" id="e-to-wallet-chips" style="margin-bottom:12px"></div>
-  </div>
-
-  <div id="e-cat-wrap">
-    <div class="field">
-      <div class="field-label">Category</div>
-      <select id="e-category"></select>
+  <div class="coach-header">
+    <div class="logo">GRIP<sub>SOCIAL COACH · V8</sub></div>
+    <div class="header-pills">
+      <div class="pill">⭐ <span id="statUsed">0</span></div>
+      <div class="pill">🃏 <span id="statCards">0</span></div>
+      <button class="icon-btn" onclick="openFavs()">📂</button>
     </div>
   </div>
 
-  <div id="e-nec-wrap">
-    <div class="field-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">Necessity</div>
-    <div class="chip-grid" style="margin-bottom:10px">
-      <div class="chip on" data-nec="needed"   onclick="Entry.setNec(this)">✅ Needed</div>
-      <div class="chip"    data-nec="avoid"    onclick="Entry.setNec(this)">⚠️ Could Avoid</div>
-      <div class="chip"    data-nec="wasteful" onclick="Entry.setNec(this)">❌ Wasteful</div>
+  <div class="selectors">
+    <div class="sel-wrap">
+      <select id="place" onchange="next()">
+        <option value="cafe">☕ Cafe</option>
+        <option value="street">🏙️ Street</option>
+        <option value="hotel">🏨 Hotel</option>
+        <option value="group">👥 Group</option>
+        <option value="gym">💪 Gym</option>
+        <option value="event">🎉 Event</option>
+        <option value="transport">🚌 Transport</option>
+        <option value="market">🛒 Market</option>
+        <option value="beach">🏖️ Beach</option>
+        <option value="park">🌳 Park</option>
+      </select>
+    </div>
+    <div class="sel-wrap">
+      <select id="intent" onchange="next()">
+        <option value="neutral">😶 Neutral</option>
+        <option value="friend">🤝 Friend</option>
+        <option value="date">❤️ Date</option>
+        <option value="bro">🤜 Bro</option>
+        <option value="network">💼 Network</option>
+      </select>
     </div>
   </div>
 
-  <div id="e-mood-wrap">
-    <div class="field-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:2px">How are you feeling?</div>
-    <div class="mood-row">
-      <button class="mood-btn" data-mood="😊" onclick="Entry.setMood(this)">😊</button>
-      <button class="mood-btn" data-mood="😐" onclick="Entry.setMood(this)">😐</button>
-      <button class="mood-btn" data-mood="😩" onclick="Entry.setMood(this)">😩</button>
-      <button class="mood-btn" data-mood="😤" onclick="Entry.setMood(this)">😤</button>
-      <button class="mood-btn" data-mood="😰" onclick="Entry.setMood(this)">😰</button>
-      <button class="mood-btn" data-mood="🥳" onclick="Entry.setMood(this)">🥳</button>
+  <div class="mode-tabs">
+    <button class="tab active" id="tab-opener" onclick="setMode('opener')">Opener</button>
+    <button class="tab" id="tab-follow" onclick="setMode('follow')">Follow-Up</button>
+    <button class="tab" id="tab-hook" onclick="setMode('hook')">Hook</button>
+    <button class="tab" id="tab-exit" onclick="setMode('exit')">Exit</button>
+  </div>
+
+  <div class="card-wrap">
+    <div class="card anim" id="mainCard">
+      <button class="speak-fab" id="speakFab" onclick="speakCard()">🔊</button>
+      <div class="card-tag" id="cardTag">OPENER</div>
+      <div class="phrase-tip" id="cardTip">Loading...</div>
+      <div class="phrase-main" id="cardPhrase">Loading...</div>
+      <div class="phrase-chain" id="cardChain" style="display:none;"></div>
+      <div class="card-footer">
+        <div class="card-ctx" id="cardCtx">cafe · neutral</div>
+        <div class="saved-ind" id="savedInd">⭐ Saved!</div>
+      </div>
+      <div class="swipe-hint">← swipe →</div>
     </div>
   </div>
 
-  <div id="e-person-wrap">
-    <div class="field">
-      <div class="field-label">Link to Person (optional)</div>
-      <select id="e-person" onchange="Entry._onPersonChange()"></select>
+  <div class="actions">
+    <button class="btn btn-prev" onclick="prev()">← Back</button>
+    <button class="btn btn-next" onclick="next()">Next →</button>
+    <button class="btn btn-star" onclick="saveFav()">⭐ Save</button>
+  </div>
+
+  <div class="bot-pad"></div>
+</div>
+
+<!-- ══════════════════ BOARD PAGE ══════════════════ -->
+<div class="page" id="pageBoard">
+
+  <div class="kb-output">
+    <div class="kb-display" id="kbDisplay">
+      <span class="kb-placeholder" id="kbPlaceholder">Tap words below to build a phrase…</span>
+    </div>
+    <div class="kb-actions-row">
+      <button class="kb-btn" onclick="kbUndo()">⌫ Undo</button>
+      <button class="kb-btn clr" onclick="kbClear()">✕ Clear</button>
+      <button class="kb-btn speak" onclick="kbSpeak()">🔊 Speak</button>
     </div>
   </div>
 
-  <div id="e-share-wrap" style="display:none">
-    <div class="field">
-      <div class="field-label">Their Share (₱)</div>
-      <input id="e-share" type="number" placeholder="0.00" inputmode="decimal" oninput="Entry._updateShareHint()"/>
-      <div style="font-size:11px;color:var(--txt-3);margin-top:3px" id="e-share-hint"></div>
+  <div class="kb-sections">
+    <button class="sec-tab active" onclick="switchSection(this,'person')">👤 Person</button>
+    <button class="sec-tab" onclick="switchSection(this,'place')">📍 Place</button>
+    <button class="sec-tab" onclick="switchSection(this,'verb')">⚡ Verb</button>
+    <button class="sec-tab" onclick="switchSection(this,'food')">🍽️ Food</button>
+    <button class="sec-tab" onclick="switchSection(this,'tourist')">🗺️ Tourist</button>
+  </div>
+
+  <div class="kb-grid-wrap">
+
+    <!-- PERSON -->
+    <div class="kb-section active" id="sec-person">
+      <div class="sec-title">Job / Role</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'doctor','doktor')"><span class="chip-en">Doctor</span><span class="chip-tl">doktor</span></div>
+        <div class="word-chip" onclick="kbTap(this,'nurse','nars')"><span class="chip-en">Nurse</span><span class="chip-tl">nars</span></div>
+        <div class="word-chip" onclick="kbTap(this,'police','pulis')"><span class="chip-en">Police</span><span class="chip-tl">pulis</span></div>
+        <div class="word-chip" onclick="kbTap(this,'teacher','guro')"><span class="chip-en">Teacher</span><span class="chip-tl">guro</span></div>
+        <div class="word-chip" onclick="kbTap(this,'driver','tsuper')"><span class="chip-en">Driver</span><span class="chip-tl">tsuper</span></div>
+        <div class="word-chip" onclick="kbTap(this,'guard','guwardya')"><span class="chip-en">Guard</span><span class="chip-tl">guwardya</span></div>
+        <div class="word-chip" onclick="kbTap(this,'worker','manggagawa')"><span class="chip-en">Worker</span><span class="chip-tl">manggagawa</span></div>
+        <div class="word-chip" onclick="kbTap(this,'manager','manager')"><span class="chip-en">Manager</span><span class="chip-tl">manager</span></div>
+        <div class="word-chip" onclick="kbTap(this,'student','estudyante')"><span class="chip-en">Student</span><span class="chip-tl">estudyante</span></div>
+        <div class="word-chip" onclick="kbTap(this,'vendor','tindera')"><span class="chip-en">Vendor</span><span class="chip-tl">tindera</span></div>
+        <div class="word-chip" onclick="kbTap(this,'chef','kusinero')"><span class="chip-en">Chef</span><span class="chip-tl">kusinero</span></div>
+        <div class="word-chip" onclick="kbTap(this,'tour guide','tour guide')"><span class="chip-en">Tour guide</span><span class="chip-tl">tour guide</span></div>
+      </div>
+      <div class="sec-title">Description</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'uniform','uniporme')"><span class="chip-en">Uniform</span><span class="chip-tl">uniporme</span></div>
+        <div class="word-chip" onclick="kbTap(this,'tall','matangkad')"><span class="chip-en">Tall</span><span class="chip-tl">matangkad</span></div>
+        <div class="word-chip" onclick="kbTap(this,'short','maikli')"><span class="chip-en">Short</span><span class="chip-tl">maikli</span></div>
+        <div class="word-chip" onclick="kbTap(this,'old','matanda')"><span class="chip-en">Old</span><span class="chip-tl">matanda</span></div>
+        <div class="word-chip" onclick="kbTap(this,'young','bata')"><span class="chip-en">Young</span><span class="chip-tl">bata</span></div>
+        <div class="word-chip" onclick="kbTap(this,'woman','babae')"><span class="chip-en">Woman</span><span class="chip-tl">babae</span></div>
+        <div class="word-chip" onclick="kbTap(this,'man','lalaki')"><span class="chip-en">Man</span><span class="chip-tl">lalaki</span></div>
+        <div class="word-chip" onclick="kbTap(this,'with glasses','may salamin')"><span class="chip-en">Glasses</span><span class="chip-tl">may salamin</span></div>
+        <div class="word-chip" onclick="kbTap(this,'white shirt','puting damit')"><span class="chip-en">White shirt</span><span class="chip-tl">puting damit</span></div>
+      </div>
+      <div class="sec-title">Pronouns</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'I','ako')"><span class="chip-en">I</span><span class="chip-tl">ako</span></div>
+        <div class="word-chip" onclick="kbTap(this,'you','ikaw')"><span class="chip-en">You</span><span class="chip-tl">ikaw</span></div>
+        <div class="word-chip" onclick="kbTap(this,'he / she','siya')"><span class="chip-en">He / She</span><span class="chip-tl">siya</span></div>
+        <div class="word-chip" onclick="kbTap(this,'we','kami')"><span class="chip-en">We</span><span class="chip-tl">kami</span></div>
+        <div class="word-chip" onclick="kbTap(this,'they','sila')"><span class="chip-en">They</span><span class="chip-tl">sila</span></div>
+        <div class="word-chip" onclick="kbTap(this,'friend','kaibigan')"><span class="chip-en">Friend</span><span class="chip-tl">kaibigan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'family','pamilya')"><span class="chip-en">Family</span><span class="chip-tl">pamilya</span></div>
+        <div class="word-chip" onclick="kbTap(this,'alone','mag-isa')"><span class="chip-en">Alone</span><span class="chip-tl">mag-isa</span></div>
+      </div>
     </div>
-  </div>
 
-  <div id="e-goal-wrap">
-    <div class="field">
-      <div class="field-label">Link to Goal (optional)</div>
-      <select id="e-goal"></select>
+    <!-- PLACE -->
+    <div class="kb-section" id="sec-place">
+      <div class="sec-title">Location</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'here','dito')"><span class="chip-en">Here</span><span class="chip-tl">dito</span></div>
+        <div class="word-chip" onclick="kbTap(this,'there','doon')"><span class="chip-en">There</span><span class="chip-tl">doon</span></div>
+        <div class="word-chip" onclick="kbTap(this,'outside','labas')"><span class="chip-en">Outside</span><span class="chip-tl">labas</span></div>
+        <div class="word-chip" onclick="kbTap(this,'inside','loob')"><span class="chip-en">Inside</span><span class="chip-tl">loob</span></div>
+        <div class="word-chip" onclick="kbTap(this,'nearby','malapit')"><span class="chip-en">Nearby</span><span class="chip-tl">malapit</span></div>
+        <div class="word-chip" onclick="kbTap(this,'far','malayo')"><span class="chip-en">Far</span><span class="chip-tl">malayo</span></div>
+        <div class="word-chip" onclick="kbTap(this,'upstairs','itaas')"><span class="chip-en">Upstairs</span><span class="chip-tl">itaas</span></div>
+        <div class="word-chip" onclick="kbTap(this,'downstairs','ibaba')"><span class="chip-en">Downstairs</span><span class="chip-tl">ibaba</span></div>
+        <div class="word-chip" onclick="kbTap(this,'corner','kanto')"><span class="chip-en">Corner</span><span class="chip-tl">kanto</span></div>
+        <div class="word-chip" onclick="kbTap(this,'market','palengke')"><span class="chip-en">Market</span><span class="chip-tl">palengke</span></div>
+        <div class="word-chip" onclick="kbTap(this,'hospital','ospital')"><span class="chip-en">Hospital</span><span class="chip-tl">ospital</span></div>
+        <div class="word-chip" onclick="kbTap(this,'church','simbahan')"><span class="chip-en">Church</span><span class="chip-tl">simbahan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'bus stop','hintayan ng bus')"><span class="chip-en">Bus stop</span><span class="chip-tl">hintayan ng bus</span></div>
+        <div class="word-chip" onclick="kbTap(this,'airport','paliparan')"><span class="chip-en">Airport</span><span class="chip-tl">paliparan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'beach','dalampasigan')"><span class="chip-en">Beach</span><span class="chip-tl">dalampasigan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'hotel','hotel')"><span class="chip-en">Hotel</span><span class="chip-tl">hotel</span></div>
+      </div>
+      <div class="sec-title">Direction</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'left','kaliwa')"><span class="chip-en">Left</span><span class="chip-tl">kaliwa</span></div>
+        <div class="word-chip" onclick="kbTap(this,'right','kanan')"><span class="chip-en">Right</span><span class="chip-tl">kanan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'straight','diretso')"><span class="chip-en">Straight</span><span class="chip-tl">diretso</span></div>
+        <div class="word-chip" onclick="kbTap(this,'turn','liko')"><span class="chip-en">Turn</span><span class="chip-tl">liko</span></div>
+        <div class="word-chip" onclick="kbTap(this,'behind','likod')"><span class="chip-en">Behind</span><span class="chip-tl">likod</span></div>
+        <div class="word-chip" onclick="kbTap(this,'in front','harap')"><span class="chip-en">In front</span><span class="chip-tl">harap</span></div>
+        <div class="word-chip" onclick="kbTap(this,'this way','ganito')"><span class="chip-en">This way</span><span class="chip-tl">ganito</span></div>
+        <div class="word-chip" onclick="kbTap(this,'that way','ganoon')"><span class="chip-en">That way</span><span class="chip-tl">ganoon</span></div>
+      </div>
+      <div class="sec-title">Facilities</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'restroom','CR')"><span class="chip-en">Restroom</span><span class="chip-tl">CR</span></div>
+        <div class="word-chip" onclick="kbTap(this,'elevator','elevator')"><span class="chip-en">Elevator</span><span class="chip-tl">elevator</span></div>
+        <div class="word-chip" onclick="kbTap(this,'exit','labasan')"><span class="chip-en">Exit</span><span class="chip-tl">labasan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'entrance','pasukan')"><span class="chip-en">Entrance</span><span class="chip-tl">pasukan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'ATM','ATM')"><span class="chip-en">ATM</span><span class="chip-tl">ATM</span></div>
+        <div class="word-chip" onclick="kbTap(this,'wifi','wifi')"><span class="chip-en">Wifi</span><span class="chip-tl">wifi</span></div>
+        <div class="word-chip" onclick="kbTap(this,'parking','parking')"><span class="chip-en">Parking</span><span class="chip-tl">parking</span></div>
+        <div class="word-chip" onclick="kbTap(this,'counter','counter')"><span class="chip-en">Counter</span><span class="chip-tl">counter</span></div>
+      </div>
     </div>
-  </div>
 
-  <div class="field">
-    <div class="field-label">Note</div>
-    <input id="e-note" type="text" placeholder="What was this for?"/>
-  </div>
-
-  <div class="field">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="field-label" style="margin:0">Recurring Monthly</div>
-      <div class="toggle" id="e-recur-toggle" onclick="Entry.toggleRecur()"></div>
+    <!-- VERB -->
+    <div class="kb-section" id="sec-verb">
+      <div class="sec-title">Basic Actions</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'eat','kumain')"><span class="chip-en">Eat</span><span class="chip-tl">kumain</span></div>
+        <div class="word-chip" onclick="kbTap(this,'drink','uminom')"><span class="chip-en">Drink</span><span class="chip-tl">uminom</span></div>
+        <div class="word-chip" onclick="kbTap(this,'sleep','matulog')"><span class="chip-en">Sleep</span><span class="chip-tl">matulog</span></div>
+        <div class="word-chip" onclick="kbTap(this,'rest','magpahinga')"><span class="chip-en">Rest</span><span class="chip-tl">magpahinga</span></div>
+        <div class="word-chip" onclick="kbTap(this,'go','pumunta')"><span class="chip-en">Go</span><span class="chip-tl">pumunta</span></div>
+        <div class="word-chip" onclick="kbTap(this,'wait','maghintay')"><span class="chip-en">Wait</span><span class="chip-tl">maghintay</span></div>
+        <div class="word-chip" onclick="kbTap(this,'stop','huminto')"><span class="chip-en">Stop</span><span class="chip-tl">huminto</span></div>
+        <div class="word-chip" onclick="kbTap(this,'help','tulungan')"><span class="chip-en">Help</span><span class="chip-tl">tulungan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'call','tumawag')"><span class="chip-en">Call</span><span class="chip-tl">tumawag</span></div>
+        <div class="word-chip" onclick="kbTap(this,'look','tumingin')"><span class="chip-en">Look</span><span class="chip-tl">tumingin</span></div>
+        <div class="word-chip" onclick="kbTap(this,'sit','umupo')"><span class="chip-en">Sit</span><span class="chip-tl">umupo</span></div>
+        <div class="word-chip" onclick="kbTap(this,'walk','maglakad')"><span class="chip-en">Walk</span><span class="chip-tl">maglakad</span></div>
+        <div class="word-chip" onclick="kbTap(this,'buy','bumili')"><span class="chip-en">Buy</span><span class="chip-tl">bumili</span></div>
+        <div class="word-chip" onclick="kbTap(this,'pay','magbayad')"><span class="chip-en">Pay</span><span class="chip-tl">magbayad</span></div>
+        <div class="word-chip" onclick="kbTap(this,'need','kailangan')"><span class="chip-en">Need</span><span class="chip-tl">kailangan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'want','gusto')"><span class="chip-en">Want</span><span class="chip-tl">gusto</span></div>
+        <div class="word-chip" onclick="kbTap(this,'find','hanapin')"><span class="chip-en">Find</span><span class="chip-tl">hanapin</span></div>
+        <div class="word-chip" onclick="kbTap(this,'understand','naiintindihan')"><span class="chip-en">Understand</span><span class="chip-tl">naiintindihan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'know','alam')"><span class="chip-en">Know</span><span class="chip-tl">alam</span></div>
+        <div class="word-chip" onclick="kbTap(this,'come here','halika')"><span class="chip-en">Come here</span><span class="chip-tl">halika</span></div>
+      </div>
+      <div class="sec-title">Time</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'now','ngayon')"><span class="chip-en">Now</span><span class="chip-tl">ngayon</span></div>
+        <div class="word-chip" onclick="kbTap(this,'later','mamaya')"><span class="chip-en">Later</span><span class="chip-tl">mamaya</span></div>
+        <div class="word-chip" onclick="kbTap(this,'tomorrow','bukas')"><span class="chip-en">Tomorrow</span><span class="chip-tl">bukas</span></div>
+        <div class="word-chip" onclick="kbTap(this,'today','ngayon')"><span class="chip-en">Today</span><span class="chip-tl">ngayon</span></div>
+        <div class="word-chip" onclick="kbTap(this,'morning','umaga')"><span class="chip-en">Morning</span><span class="chip-tl">umaga</span></div>
+        <div class="word-chip" onclick="kbTap(this,'night','gabi')"><span class="chip-en">Night</span><span class="chip-tl">gabi</span></div>
+        <div class="word-chip" onclick="kbTap(this,'soon','malapit na')"><span class="chip-en">Soon</span><span class="chip-tl">malapit na</span></div>
+      </div>
+      <div class="sec-title">Essentials</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'please','pakisuyo')"><span class="chip-en">Please</span><span class="chip-tl">pakisuyo</span></div>
+        <div class="word-chip" onclick="kbTap(this,'thank you','salamat')"><span class="chip-en">Thank you</span><span class="chip-tl">salamat</span></div>
+        <div class="word-chip" onclick="kbTap(this,'sorry','pasensya na')"><span class="chip-en">Sorry</span><span class="chip-tl">pasensya na</span></div>
+        <div class="word-chip" onclick="kbTap(this,'yes','oo')"><span class="chip-en">Yes</span><span class="chip-tl">oo</span></div>
+        <div class="word-chip" onclick="kbTap(this,'no','hindi')"><span class="chip-en">No</span><span class="chip-tl">hindi</span></div>
+        <div class="word-chip" onclick="kbTap(this,'okay','okay')"><span class="chip-en">Okay</span><span class="chip-tl">okay</span></div>
+        <div class="word-chip" onclick="kbTap(this,'not','hindi')"><span class="chip-en">Not</span><span class="chip-tl">hindi</span></div>
+        <div class="word-chip" onclick="kbTap(this,'very','sobra')"><span class="chip-en">Very</span><span class="chip-tl">sobra</span></div>
+        <div class="word-chip" onclick="kbTap(this,'a little','konti lang')"><span class="chip-en">A little</span><span class="chip-tl">konti lang</span></div>
+        <div class="word-chip" onclick="kbTap(this,'how much','magkano')"><span class="chip-en">How much</span><span class="chip-tl">magkano</span></div>
+        <div class="word-chip" onclick="kbTap(this,'where','saan')"><span class="chip-en">Where</span><span class="chip-tl">saan</span></div>
+        <div class="word-chip" onclick="kbTap(this,'what','ano')"><span class="chip-en">What</span><span class="chip-tl">ano</span></div>
+      </div>
     </div>
-  </div>
 
-  <div class="field">
-    <div class="field-label">Receipt Photo (optional)</div>
-    <button class="btn btn-ghost" style="font-size:12px;padding:9px" onclick="document.getElementById('e-photo-input').click()">📷 Choose / Take Photo</button>
-    <input type="file" id="e-photo-input" accept="image/*" capture="environment" style="display:none" onchange="Entry.handlePhoto(this)"/>
-    <div id="e-photo-preview"></div>
-  </div>
-
-  <div id="e-breath-hint" style="display:none;text-align:center;padding:10px;background:var(--green-s);border:1px solid var(--green-g);border-radius:var(--r-m);margin-bottom:10px;font-size:12px;color:var(--green)">
-    💭 Large purchase — pause and reflect. Is this something you truly need right now?
-  </div>
-
-  <button class="btn btn-g" onclick="Entry.save()" style="margin-top:6px">Save Entry</button>
-  <button class="btn btn-ghost" onclick="U.closeModal('entry-overlay')" style="margin-top:8px">Cancel</button>
-</div>
-</div>
-
-<!-- MONTH LIST -->
-<div class="overlay" id="month-list-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('month-list-overlay')">×</div>
-  <div class="m-title" id="month-list-title">Transactions</div>
-  <div id="month-list-body"></div>
-</div>
-</div>
-
-<!-- TXN DETAIL -->
-<div class="overlay" id="txn-detail-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('txn-detail-overlay')">×</div>
-  <div id="txn-detail-body"></div>
-</div>
-</div>
-
-<!-- ADD PERSON -->
-<div class="overlay" id="person-add-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('person-add-overlay')">×</div>
-  <div class="m-title">Add Person</div>
-  <div class="field"><div class="field-label">Name</div><input id="p-name" type="text" placeholder="Kuya Charles"/></div>
-  <div class="field"><div class="field-label">Relationship</div>
-    <select id="p-rel">
-      <option>Family</option><option>Friend</option><option>Colleague</option><option>Other</option>
-    </select>
-  </div>
-  <button class="btn btn-g" onclick="Ledger.savePerson()">Add Person</button>
-  <button class="btn btn-ghost" onclick="U.closeModal('person-add-overlay')" style="margin-top:8px">Cancel</button>
-</div>
-</div>
-
-<!-- PERSON DETAIL -->
-<div class="overlay" id="person-detail-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('person-detail-overlay')">×</div>
-  <div id="person-detail-body"></div>
-</div>
-</div>
-
-<!-- SETTLE -->
-<div class="overlay" id="settle-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('settle-overlay')">×</div>
-  <div class="m-title" id="settle-title">Record Settlement</div>
-  <input type="hidden" id="settle-pid"/>
-  <input type="hidden" id="settle-mode"/>
-  <div style="font-size:12px;color:var(--txt-2);text-align:center;margin-bottom:12px" id="settle-bal"></div>
-  <div class="field"><div class="field-label">Amount (₱)</div>
-    <input id="settle-amount" type="number" placeholder="0.00" inputmode="decimal" style="font-size:18px;font-family:var(--fm)"/>
-  </div>
-  <div class="field"><div class="field-label">Note</div>
-    <input id="settle-note" type="text" placeholder="Cash, GCash, bank transfer…"/>
-  </div>
-  <button class="btn btn-g" onclick="Ledger.saveSettle()">Record Settlement</button>
-  <button class="btn btn-ghost" onclick="U.closeModal('settle-overlay')" style="margin-top:8px">Cancel</button>
-</div>
-</div>
-
-<!-- ADD GOAL -->
-<div class="overlay" id="goal-add-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('goal-add-overlay')">×</div>
-  <div class="m-title">Add Goal</div>
-  <div class="field"><div class="field-label">Name</div>
-    <input id="g-name" type="text" placeholder="Palawan Trip, RTX 5080, Car Maintenance…"/>
-  </div>
-  <div class="field"><div class="field-label">Category</div>
-    <select id="g-cat">
-      <option value="savings">💰 Savings</option>
-      <option value="trip">✈️ Trip / Travel</option>
-      <option value="event">🎉 Event / Birthday</option>
-      <option value="gadget">📱 Gadget</option>
-      <option value="maintenance">🔧 Maintenance</option>
-      <option value="health">🏥 Health</option>
-      <option value="hobby">🎯 Hobby / Lifestyle</option>
-      <option value="other">📌 Other</option>
-    </select>
-  </div>
-  <div class="field-row">
-    <div class="field"><div class="field-label">Target Amount (₱)</div>
-      <input id="g-target" type="number" placeholder="8000" inputmode="decimal"/>
+    <!-- FOOD -->
+    <div class="kb-section" id="sec-food">
+      <div class="sec-title">Drinks</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'coffee','kape')"><span class="chip-en">Coffee</span><span class="chip-tl">kape</span></div>
+        <div class="word-chip" onclick="kbTap(this,'water','tubig')"><span class="chip-en">Water</span><span class="chip-tl">tubig</span></div>
+        <div class="word-chip" onclick="kbTap(this,'juice','juice')"><span class="chip-en">Juice</span><span class="chip-tl">juice</span></div>
+        <div class="word-chip" onclick="kbTap(this,'beer','serbesa')"><span class="chip-en">Beer</span><span class="chip-tl">serbesa</span></div>
+        <div class="word-chip" onclick="kbTap(this,'tea','tsaa')"><span class="chip-en">Tea</span><span class="chip-tl">tsaa</span></div>
+        <div class="word-chip" onclick="kbTap(this,'milk','gatas')"><span class="chip-en">Milk</span><span class="chip-tl">gatas</span></div>
+        <div class="word-chip" onclick="kbTap(this,'cold','malamig')"><span class="chip-en">Cold</span><span class="chip-tl">malamig</span></div>
+        <div class="word-chip" onclick="kbTap(this,'hot','mainit')"><span class="chip-en">Hot</span><span class="chip-tl">mainit</span></div>
+      </div>
+      <div class="sec-title">Food</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'bread','tinapay')"><span class="chip-en">Bread</span><span class="chip-tl">tinapay</span></div>
+        <div class="word-chip" onclick="kbTap(this,'rice','kanin')"><span class="chip-en">Rice</span><span class="chip-tl">kanin</span></div>
+        <div class="word-chip" onclick="kbTap(this,'chicken','manok')"><span class="chip-en">Chicken</span><span class="chip-tl">manok</span></div>
+        <div class="word-chip" onclick="kbTap(this,'fish','isda')"><span class="chip-en">Fish</span><span class="chip-tl">isda</span></div>
+        <div class="word-chip" onclick="kbTap(this,'pork','baboy')"><span class="chip-en">Pork</span><span class="chip-tl">baboy</span></div>
+        <div class="word-chip" onclick="kbTap(this,'vegetables','gulay')"><span class="chip-en">Vegetables</span><span class="chip-tl">gulay</span></div>
+        <div class="word-chip" onclick="kbTap(this,'fruit','prutas')"><span class="chip-en">Fruit</span><span class="chip-tl">prutas</span></div>
+        <div class="word-chip" onclick="kbTap(this,'egg','itlog')"><span class="chip-en">Egg</span><span class="chip-tl">itlog</span></div>
+        <div class="word-chip" onclick="kbTap(this,'soup','sabaw')"><span class="chip-en">Soup</span><span class="chip-tl">sabaw</span></div>
+        <div class="word-chip" onclick="kbTap(this,'snack','meryenda')"><span class="chip-en">Snack</span><span class="chip-tl">meryenda</span></div>
+        <div class="word-chip" onclick="kbTap(this,'adobo','adobo')"><span class="chip-en">Adobo</span><span class="chip-tl">adobo</span></div>
+        <div class="word-chip" onclick="kbTap(this,'sinigang','sinigang')"><span class="chip-en">Sinigang</span><span class="chip-tl">sinigang</span></div>
+        <div class="word-chip" onclick="kbTap(this,'lechon','lechon')"><span class="chip-en">Lechon</span><span class="chip-tl">lechon</span></div>
+        <div class="word-chip" onclick="kbTap(this,'lumpia','lumpia')"><span class="chip-en">Lumpia</span><span class="chip-tl">lumpia</span></div>
+        <div class="word-chip" onclick="kbTap(this,'halo-halo','halo-halo')"><span class="chip-en">Halo-halo</span><span class="chip-tl">halo-halo</span></div>
+      </div>
+      <div class="sec-title">Ordering</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'one order of','isang order ng')"><span class="chip-en">One order</span><span class="chip-tl">isang order ng</span></div>
+        <div class="word-chip" onclick="kbTap(this,'two','dalawa')"><span class="chip-en">Two</span><span class="chip-tl">dalawa</span></div>
+        <div class="word-chip" onclick="kbTap(this,'the bill','ang bill')"><span class="chip-en">The bill</span><span class="chip-tl">ang bill</span></div>
+        <div class="word-chip" onclick="kbTap(this,'takeout','take out')"><span class="chip-en">Takeout</span><span class="chip-tl">take out</span></div>
+        <div class="word-chip" onclick="kbTap(this,'dine in','dine in')"><span class="chip-en">Dine in</span><span class="chip-tl">dine in</span></div>
+        <div class="word-chip" onclick="kbTap(this,'no sugar','walang asukal')"><span class="chip-en">No sugar</span><span class="chip-tl">walang asukal</span></div>
+        <div class="word-chip" onclick="kbTap(this,'spicy','maanghang')"><span class="chip-en">Spicy</span><span class="chip-tl">maanghang</span></div>
+        <div class="word-chip" onclick="kbTap(this,'not spicy','hindi maanghang')"><span class="chip-en">Not spicy</span><span class="chip-tl">hindi maanghang</span></div>
+        <div class="word-chip" onclick="kbTap(this,'delicious','masarap')"><span class="chip-en">Delicious</span><span class="chip-tl">masarap</span></div>
+      </div>
     </div>
-    <div class="field"><div class="field-label">Target Date</div>
-      <input id="g-date" type="date"/>
+
+    <!-- TOURIST -->
+    <div class="kb-section" id="sec-tourist">
+      <div class="sec-title">Emergency / Health</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'help me','tulungan mo ako')"><span class="chip-en">Help me</span><span class="chip-tl">tulungan mo ako</span></div>
+        <div class="word-chip" onclick="kbTap(this,'emergency','emergency')"><span class="chip-en">Emergency</span><span class="chip-tl">emergency</span></div>
+        <div class="word-chip" onclick="kbTap(this,'I am sick','may sakit ako')"><span class="chip-en">I am sick</span><span class="chip-tl">may sakit ako</span></div>
+        <div class="word-chip" onclick="kbTap(this,'I am lost','nawawala ako')"><span class="chip-en">I am lost</span><span class="chip-tl">nawawala ako</span></div>
+        <div class="word-chip" onclick="kbTap(this,'ambulance','ambulansya')"><span class="chip-en">Ambulance</span><span class="chip-tl">ambulansya</span></div>
+        <div class="word-chip" onclick="kbTap(this,'medicine','gamot')"><span class="chip-en">Medicine</span><span class="chip-tl">gamot</span></div>
+        <div class="word-chip" onclick="kbTap(this,'pharmacy','botika')"><span class="chip-en">Pharmacy</span><span class="chip-tl">botika</span></div>
+        <div class="word-chip" onclick="kbTap(this,'it hurts here','masakit dito')"><span class="chip-en">It hurts here</span><span class="chip-tl">masakit dito</span></div>
+        <div class="word-chip" onclick="kbTap(this,'I am allergic','allergic ako')"><span class="chip-en">I am allergic</span><span class="chip-tl">allergic ako</span></div>
+      </div>
+      <div class="sec-title">Transport</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'taxi','taksi')"><span class="chip-en">Taxi</span><span class="chip-tl">taksi</span></div>
+        <div class="word-chip" onclick="kbTap(this,'jeepney','dyipni')"><span class="chip-en">Jeepney</span><span class="chip-tl">dyipni</span></div>
+        <div class="word-chip" onclick="kbTap(this,'tricycle','traysikel')"><span class="chip-en">Tricycle</span><span class="chip-tl">traysikel</span></div>
+        <div class="word-chip" onclick="kbTap(this,'bus','bus')"><span class="chip-en">Bus</span><span class="chip-tl">bus</span></div>
+        <div class="word-chip" onclick="kbTap(this,'how far','gaano kalayo')"><span class="chip-en">How far</span><span class="chip-tl">gaano kalayo</span></div>
+        <div class="word-chip" onclick="kbTap(this,'how long','gaano katagal')"><span class="chip-en">How long</span><span class="chip-tl">gaano katagal</span></div>
+        <div class="word-chip" onclick="kbTap(this,'I want to go to','gusto kong pumunta sa')"><span class="chip-en">I want to go to</span><span class="chip-tl">gusto kong pumunta sa</span></div>
+        <div class="word-chip" onclick="kbTap(this,'drop me here','dito na lang')"><span class="chip-en">Drop me here</span><span class="chip-tl">dito na lang</span></div>
+      </div>
+      <div class="sec-title">Accommodation</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'check in','check in')"><span class="chip-en">Check in</span><span class="chip-tl">check in</span></div>
+        <div class="word-chip" onclick="kbTap(this,'check out','check out')"><span class="chip-en">Check out</span><span class="chip-tl">check out</span></div>
+        <div class="word-chip" onclick="kbTap(this,'room','kwarto')"><span class="chip-en">Room</span><span class="chip-tl">kwarto</span></div>
+        <div class="word-chip" onclick="kbTap(this,'key','susi')"><span class="chip-en">Key</span><span class="chip-tl">susi</span></div>
+        <div class="word-chip" onclick="kbTap(this,'towel','tuwalya')"><span class="chip-en">Towel</span><span class="chip-tl">tuwalya</span></div>
+        <div class="word-chip" onclick="kbTap(this,'air-con','aircon')"><span class="chip-en">A/C</span><span class="chip-tl">aircon</span></div>
+        <div class="word-chip" onclick="kbTap(this,'hot water','mainit na tubig')"><span class="chip-en">Hot water</span><span class="chip-tl">mainit na tubig</span></div>
+        <div class="word-chip" onclick="kbTap(this,'reservation','reserbasyon')"><span class="chip-en">Reservation</span><span class="chip-tl">reserbasyon</span></div>
+      </div>
+      <div class="sec-title">Sightseeing</div>
+      <div class="word-grid">
+        <div class="word-chip" onclick="kbTap(this,'beautiful','maganda')"><span class="chip-en">Beautiful</span><span class="chip-tl">maganda</span></div>
+        <div class="word-chip" onclick="kbTap(this,'take a photo','kumuha ng litrato')"><span class="chip-en">Take photo</span><span class="chip-tl">kumuha ng litrato</span></div>
+        <div class="word-chip" onclick="kbTap(this,'entrance fee','bayad sa pasok')"><span class="chip-en">Entrance fee</span><span class="chip-tl">bayad sa pasok</span></div>
+        <div class="word-chip" onclick="kbTap(this,'open','bukas')"><span class="chip-en">Open</span><span class="chip-tl">bukas</span></div>
+        <div class="word-chip" onclick="kbTap(this,'closed','sarado')"><span class="chip-en">Closed</span><span class="chip-tl">sarado</span></div>
+        <div class="word-chip" onclick="kbTap(this,'souvenir','pasalubong')"><span class="chip-en">Souvenir</span><span class="chip-tl">pasalubong</span></div>
+        <div class="word-chip" onclick="kbTap(this,'swimming','palangoy')"><span class="chip-en">Swimming</span><span class="chip-tl">palangoy</span></div>
+        <div class="word-chip" onclick="kbTap(this,'tour','tour')"><span class="chip-en">Tour</span><span class="chip-tl">tour</span></div>
+      </div>
     </div>
-  </div>
-  <div class="field"><div class="field-label">Repeats</div>
-    <select id="g-repeat">
-      <option value="">No repeat</option>
-      <option value="weekly">Weekly</option>
-      <option value="monthly">Monthly</option>
-      <option value="yearly">Yearly</option>
-    </select>
-  </div>
-  <div class="field"><div class="field-label">Person (for events/birthdays)</div>
-    <select id="g-person"></select>
-  </div>
-  <div class="field"><div class="field-label">Notes</div>
-    <input id="g-note" type="text" placeholder="Any details…"/>
-  </div>
-  <button class="btn btn-g" onclick="Ledger.saveGoal()">Add Goal</button>
-  <button class="btn btn-ghost" onclick="U.closeModal('goal-add-overlay')" style="margin-top:8px">Cancel</button>
-</div>
-</div>
 
-<!-- GOAL DETAIL -->
-<div class="overlay" id="goal-detail-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('goal-detail-overlay')">×</div>
-  <div id="goal-detail-body"></div>
-</div>
-</div>
+  </div><!-- end kb-grid-wrap -->
+</div><!-- end pageBoard -->
 
-<!-- AI PROMPT -->
-<div class="overlay" id="prompt-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('prompt-overlay')">×</div>
-  <div class="m-title">AI Analysis Prompt</div>
-  <div style="font-size:11px;color:var(--txt-2);margin-bottom:10px">Select layers → copy → paste to AI → paste response back.</div>
-  <div class="chip-grid" id="prompt-layers">
-    <div class="chip on" data-layer="snapshot" onclick="Charts.togglePromptLayer(this)">📊 Snapshot</div>
-    <div class="chip on" data-layer="habits"   onclick="Charts.togglePromptLayer(this)">📈 Habits</div>
-    <div class="chip on" data-layer="regret"   onclick="Charts.togglePromptLayer(this)">💸 Regret</div>
-    <div class="chip on" data-layer="debts"    onclick="Charts.togglePromptLayer(this)">👥 Debts & Goals</div>
-    <div class="chip"    data-layer="journal"  onclick="Charts.togglePromptLayer(this)">📓 Journal</div>
-    <div class="chip"    data-layer="vault"    onclick="Charts.togglePromptLayer(this)">😤 Emotional</div>
-  </div>
-  <div class="report-box" id="prompt-output"></div>
-  <button class="btn btn-g" style="margin-bottom:8px" onclick="Charts.copyPrompt()">📋 Copy Prompt</button>
-  <div style="font-size:11px;font-weight:700;color:var(--txt-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Paste AI Response:</div>
-  <textarea id="ai-response-input" style="width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-m);padding:11px;color:var(--txt);font-size:13px;min-height:100px;resize:none;line-height:1.6" placeholder="Paste the AI output here…"></textarea>
-  <button class="btn btn-ghost" style="margin-top:8px;font-size:13px" onclick="Charts.parseResponse()">Parse & Apply</button>
-  <button class="btn btn-ghost" onclick="U.closeModal('prompt-overlay')" style="margin-top:8px">Close</button>
-</div>
-</div>
-
-<!-- VENT / VAULT WRITE -->
-<div class="overlay" id="vent-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('vent-overlay')">×</div>
-  <div class="m-title">Write to the Vault</div>
-  <div style="font-size:12px;color:var(--txt-2);text-align:center;margin-bottom:12px">Say it all. This seals for 30 days.<br>You'll revisit it then.</div>
-  <div class="field">
-    <textarea id="vent-txt" style="min-height:140px" placeholder="What happened? What's frustrating you? Don't hold back…"></textarea>
-  </div>
-  <div class="field-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">Triggered by</div>
-  <div class="chip-grid" id="vent-tags">
-    <div class="chip" data-tag="Work"   onclick="Mind.toggleVentTag(this)">Work</div>
-    <div class="chip" data-tag="Money"  onclick="Mind.toggleVentTag(this)">Money</div>
-    <div class="chip" data-tag="Person" onclick="Mind.toggleVentTag(this)">Person</div>
-    <div class="chip" data-tag="Health" onclick="Mind.toggleVentTag(this)">Health</div>
-    <div class="chip" data-tag="Self"   onclick="Mind.toggleVentTag(this)">Self</div>
-    <div class="chip" data-tag="Other"  onclick="Mind.toggleVentTag(this)">Other</div>
-  </div>
-  <div class="field">
-    <div class="field-label">Intensity (1 = mild · 5 = intense)</div>
-    <input id="vent-intensity" type="range" min="1" max="5" value="3" style="width:100%;accent-color:var(--amber)"/>
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt-3)"><span>Mild</span><span>Intense</span></div>
-  </div>
-  <button class="btn btn-g" style="background:linear-gradient(135deg,var(--amber),#a07010)" onclick="Mind.sealVent()">🔒 Seal for 30 Days</button>
-  <button class="btn btn-ghost" onclick="U.closeModal('vent-overlay')" style="margin-top:8px">Cancel</button>
-</div>
-</div>
-
-<!-- VAULT REVEAL -->
-<div class="overlay" id="reveal-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('reveal-overlay')">×</div>
-  <div class="m-title">🔓 Vault Unsealed</div>
-  <div style="font-size:11px;color:var(--txt-3);text-align:center;margin-bottom:12px;font-family:var(--fm)" id="reveal-date"></div>
-  <div style="background:var(--bg-3);border-radius:var(--r-m);padding:13px;margin-bottom:13px;font-size:13px;color:var(--txt);line-height:1.7;font-style:italic" id="reveal-content"></div>
-  <div style="font-size:13px;font-weight:500;margin-bottom:8px">How do you feel about this now?</div>
-  <div class="chip-grid" id="reveal-chips">
-    <div class="chip" onclick="Mind.setResolution(this,'resolved')">✅ Resolved</div>
-    <div class="chip" onclick="Mind.setResolution(this,'still')">⚠️ Still affects me</div>
-    <div class="chip" onclick="Mind.setResolution(this,'grew')">🌱 Grew from it</div>
-    <div class="chip" onclick="Mind.setResolution(this,'unresolved')">❌ Unresolved</div>
-  </div>
-  <input type="hidden" id="reveal-resolution"/>
-  <div class="field" style="margin-top:10px">
-    <div class="field-label">Reflection (optional)</div>
-    <textarea id="reveal-reflection" style="min-height:70px" placeholder="What do you think now?"></textarea>
-  </div>
-  <button class="btn btn-g" onclick="Mind.submitReveal()">Save Reflection</button>
-</div>
-</div>
-
-<!-- SEARCH -->
-<div class="overlay" id="search-overlay">
-<div class="modal">
-  <div class="m-handle"></div>
-  <div class="m-close" onclick="U.closeModal('search-overlay')">×</div>
-  <div class="m-title">Search</div>
-  <div class="search-bar" style="margin-bottom:12px">
-    <span class="s-ico">🔍</span>
-    <input id="global-search" type="text" placeholder="Amount, category, note, person…" oninput="App.runSearch()"/>
-    <button class="s-clr" onclick="document.getElementById('global-search').value='';App.runSearch()">×</button>
-  </div>
-  <div id="search-results"></div>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════
-     SCRIPTS
-     ═══════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/db.js"></script>
-<script src="js/quotes.js"></script>
-<script src="js/home.js"></script>
-<script src="js/entry.js"></script>
-<script src="js/ledger.js"></script>
-<script src="js/charts.js"></script>
-<script src="js/mind.js"></script>
-<script src="js/settings.js"></script>
 <script>
-// ═══════════════════════════════════════════
-// APP BOOT & COORDINATOR
-// ═══════════════════════════════════════════
-
-// ── ONBOARDING ──────────────────────────────
-const Ob = {
-  next(step) {
-    if (step === 1) {
-      const n = document.getElementById('ob-name').value.trim();
-      if (!n) { U.toast('Please enter your name'); return; }
-      DB.data.settings.userName = n;
+// ══════════════════════════════════════════════
+// PHRASE DATA  —  Smart Phrase Engine (100% offline)
+// Opener format: {p, f, e}  →  phrase / suggested follow-up / suggested exit
+// follow / hook / exit: plain strings, exit suggested inline
+// ══════════════════════════════════════════════
+const P={
+  opener:{
+    cafe:{
+      neutral:[
+        {p:"Nice vibe dito ah.",f:"Lagi ka ba dito?",e:"Enjoy your coffee."},
+        {p:"Chill place to.",f:"First time mo dito?",e:"Nice talking."},
+        {p:"Busy today ah.",f:"Ano usually order mo?",e:"See you around."},
+        {p:"First time mo dito?",f:"What would you recommend?",e:"Thanks, take care."},
+        {p:"Okay setup nila ah.",f:"Lagi ka ba dito?",e:"Enjoy the rest of your day."},
+        {p:"Parang solid regulars dito ah.",f:"Kilala mo yung staff?",e:"Nice one, sige."},
+        {p:"Maingay ngayon ah.",f:"Okay ka dito?",e:"Take care."},
+        {p:"Good wifi spot pala to.",f:"Work ka dito?",e:"See you."},
+        {p:"Maganda sila mag-decor ah.",f:"Lagi ka ba dito?",e:"Enjoy!"},
+        {p:"Kamusta ang kape nila?",f:"Anong flavor bet mo?",e:"Nice talking."},
+        {p:"Parang lagi silang fully-booked ah.",f:"Regular ka ba?",e:"See you around."},
+        {p:"Solid corner to ah.",f:"Dito ka lagi mag-upo?",e:"Ingat ka."},
+      ],
+      friend:[
+        {p:"Nag-try ka na ng menu nila?",f:"Anong pinaka-bet mo?",e:"Add mo ko sa socials."},
+        {p:"Lagi ka ba dito? Madalas kita nakikita.",f:"Kailan ka usually pumupunta?",e:"Let's hang ulit."},
+        {p:"Okay ba wifi dito?",f:"Work ka ba ngayon?",e:"Sige, chat tayo."},
+        {p:"Anong usually order mo dito?",f:"Bet mo yung new menu?",e:"Next time sabay tayo."},
+        {p:"Kilala mo ba yung barista doon?",f:"Regulars ka pala dito ah.",e:"Ayos, hanggang sa ulit."},
+        {p:"Uy, napansin kita lagi dito.",f:"Parang regular ka na?",e:"In touch tayo."},
+      ],
+      date:[
+        {p:"Di ba maganda dito? Parang date spot ah.",f:"Okay ka ba dito?",e:"Sana ulit tayo mag-usap."},
+        {p:"Good choice ng place.",f:"Madalas ka ba pumili ng ganito?",e:"Take care ha."},
+        {p:"Chill dito, okay para sa usap.",f:"Anong pinaka-bet mo dito?",e:"Nice talking to you, really."},
+        {p:"Maganda ang lighting dito ah.",f:"Sensitive ka ba sa ambiance?",e:"Ikaw ang mag-message."},
+        {p:"Di ba cozy dito? I like it.",f:"Dito ka lagi?",e:"Sana ulit."},
+        {p:"Sobrang chill ng vibe dito, I love it.",f:"Alam mo ba dito lagi?",e:"Glad I came here today."},
+      ],
+      bro:[
+        {p:"Solid spot bro ah.",f:"Anong order mo bro?",e:"Bro solid ka, sige laban."},
+        {p:"Kape muna bago laban bro.",f:"Anong work ngayon bro?",e:"In touch tayo bro."},
+        {p:"Bet place to bro solid.",f:"Lagi ka ba dito?",e:"Take care bro."},
+        {p:"Uy bro okay coffee nila.",f:"Anong blend bet mo?",e:"Sige bro, see you."},
+        {p:"Solid energy ng lugar bro.",f:"Productive ka ba dito?",e:"Bro laban."},
+      ],
+      network:[
+        {p:"You work nearby?",f:"What do you do?",e:"Let's connect on LinkedIn."},
+        {p:"Do you usually hold meetings here?",f:"What industry are you in?",e:"I'll send you a message."},
+        {p:"Good spot for focus work no?",f:"Are you freelance or company?",e:"Nice to meet you."},
+        {p:"I keep coming back for the vibe here.",f:"What are you working on?",e:"Let's keep in touch."},
+        {p:"Great productivity spot ah.",f:"You based here?",e:"Nice meeting you."},
+      ]
+    },
+    street:{
+      neutral:[
+        {p:"Busy area today ah.",f:"Lagi ka ba dito?",e:"Take care."},
+        {p:"Medyo traffic ha.",f:"Saan ka punta?",e:"Safe travels."},
+        {p:"Malapit ka lang dito?",f:"Kilala mo ba area?",e:"Nice chatting."},
+        {p:"Nice part ng city to.",f:"Anong best spot dito?",e:"See you around."},
+        {p:"Lively ngayon ah.",f:"Event ba dito?",e:"Enjoy the day."},
+      ],
+      friend:[
+        {p:"Saan ka punta?",f:"Tara sabay?",e:"Chat tayo ulit."},
+        {p:"Kilala mo ba tong area?",f:"Anong bet mong spot dito?",e:"Sige hanggang sa ulit."},
+        {p:"Solid dito ah, maraming pagkain.",f:"Anong bet mong kain dito?",e:"Next time sabay."},
+        {p:"Uy hindi ba ito malapit sa inyo?",f:"Lagi kang lumalabas dito?",e:"Ayos, in touch."},
+      ],
+      date:[
+        {p:"Nice area ah, dito ka lagi?",f:"Anong pinaka-bet mong spot dito?",e:"Sana ulit tayo mag-usap."},
+        {p:"Gusto ko tong part ng city.",f:"Kilala mo ba area?",e:"Take care ha."},
+        {p:"Dito ka lagi? Okay taste mo.",f:"Anong hidden gems dito?",e:"Sana ulit."},
+      ],
+      bro:[
+        {p:"Solid area to ah bro.",f:"Anong best kain dito bro?",e:"Bro laban."},
+        {p:"Uy bro, tara na.",f:"Saan tayo bro?",e:"In touch tayo."},
+        {p:"Bro kilala mo area?",f:"Anong tamang daan?",e:"Solid bro."},
+      ],
+      network:[
+        {p:"You work around here?",f:"What company?",e:"Let's connect."},
+        {p:"Know any good spots nearby?",f:"You're local?",e:"I'll follow up."},
+        {p:"Are you local in this area?",f:"How long have you been here?",e:"Nice meeting you."},
+      ]
+    },
+    hotel:{
+      neutral:[
+        {p:"Nice property to ah.",f:"First time mo dito?",e:"Enjoy your stay."},
+        {p:"Maganda service nila no?",f:"Naka-stay ka na ba dito before?",e:"Have a good one."},
+        {p:"Solid hotel to ah.",f:"Okay ba room mo?",e:"Nice talking."},
+        {p:"Okay lobby ah.",f:"May event ka ba?",e:"Enjoy!"},
+      ],
+      friend:[
+        {p:"Naka-stay ka na ba dito?",f:"Okay ba room nila?",e:"Let's hang again."},
+        {p:"May event ka ba?",f:"Sino kasama mo?",e:"Add mo ko."},
+        {p:"Anong magandang kain dito?",f:"Okay ba restaurant nila?",e:"In touch."},
+      ],
+      date:[
+        {p:"Maganda tong hotel ah, may occasion ka?",f:"Dito ka lang naka-stay?",e:"Nice talking to you."},
+        {p:"Di ba nice lobby?",f:"Okay ba ang vibe?",e:"Sana ulit."},
+        {p:"Solid place para sa occasion.",f:"Special ba today?",e:"Ikaw ang mag-message."},
+      ],
+      bro:[
+        {p:"Bro solid hotel to ah.",f:"Okay ba room mo bro?",e:"In touch bro."},
+        {p:"Uy bro event ka ba?",f:"Libre ba?",e:"Solid bro."},
+        {p:"Bro okay ang lounge nila.",f:"Lagi ka dito?",e:"Bro laban."},
+      ],
+      network:[
+        {p:"Are you here for the event?",f:"What industry are you in?",e:"Let's connect on LinkedIn."},
+        {p:"What brings you here?",f:"Are you local?",e:"I'll send you a message."},
+        {p:"Good venue for meetings no?",f:"You do events here often?",e:"Nice meeting you."},
+      ]
+    },
+    group:{
+      neutral:[
+        {p:"Barkada niyo?",f:"Tagal na kayong magkakilala?",e:"Enjoy!"},
+        {p:"May okasyon?",f:"Sino kaarawan?",e:"Have a great time."},
+        {p:"Solid energy ng grupo niyo.",f:"Lagi kayong magkasama?",e:"Enjoy the night."},
+      ],
+      friend:[
+        {p:"Saan kayo usually nag-tambay?",f:"Okay ba yung place na yun?",e:"Let's all hang."},
+        {p:"Palagi kayong magkasama?",f:"Paano kayo nagkakilala?",e:"Nice meeting everyone."},
+        {p:"Solid barkada niyo ah.",f:"Matagal na ba kayong magkaibigan?",e:"Hanggang sa ulit."},
+      ],
+      date:[
+        {p:"Kasama mo mga friends mo? Ang saya.",f:"Okay ba sila?",e:"Nice talking to you."},
+        {p:"Nice energy ng grupo niyo.",f:"Close ba kayo?",e:"Sana ulit tayo mag-usap."},
+        {p:"Solid group niyo ah.",f:"Lagi kayong magkasama?",e:"Ikaw ang mag-message."},
+      ],
+      bro:[
+        {p:"Bro, solid squad niyo ah.",f:"Bro sino silang lahat?",e:"Bro solid kayo."},
+        {p:"Uy bro, ang dami ninyo.",f:"Okay ba lahat?",e:"In touch bro."},
+        {p:"Solid energy niyo bro.",f:"Anong occasion?",e:"See you bro."},
+      ],
+      network:[
+        {p:"Are you all from the same company?",f:"What team are you in?",e:"Let's connect."},
+        {p:"What brought the group together?",f:"How long have you all known each other?",e:"Nice meeting everyone."},
+        {p:"Quite a team you have here.",f:"Are you all in the same industry?",e:"Let's keep in touch."},
+      ]
+    },
+    gym:{
+      neutral:[
+        {p:"Lagi ka ba dito?",f:"Matagal ka nang nag-gym dito?",e:"Good workout."},
+        {p:"Okay equipment nila no?",f:"Anong program mo?",e:"Solid, keep it up."},
+        {p:"Crowded ngayon ah.",f:"Anong oras ka usually?",e:"See you next session."},
+      ],
+      friend:[
+        {p:"Sino trainer mo?",f:"Okay ba siya?",e:"Let's train together."},
+        {p:"Anong program mo?",f:"Ilang months ka na?",e:"See you sa gym."},
+        {p:"Okay progress mo ah.",f:"Ano target mo?",e:"Add mo ko."},
+      ],
+      date:[
+        {p:"Consistent ka ah, lagi kita nakikita dito.",f:"Anong workout mo today?",e:"Take care ha."},
+        {p:"Solid progress mo ah.",f:"Ilang months ka na?",e:"Ikaw ang mag-message."},
+        {p:"Lagi ka ba umaga?",f:"Mas bet mo morning or evening?",e:"Nice talking."},
+      ],
+      bro:[
+        {p:"Bro, solid gains.",f:"Anong split mo bro?",e:"Bro laban sa next set."},
+        {p:"Bro anong program mo?",f:"Sino nagprograma?",e:"Solid bro."},
+        {p:"Solid physique bro ah.",f:"Ilang months ka na?",e:"Bro keep going."},
+      ],
+      network:[
+        {p:"Are you a trainer here?",f:"How long have you been training?",e:"Nice meeting you."},
+        {p:"What program are you running?",f:"Who designed it?",e:"Let's connect."},
+        {p:"You seem like you know this gym well.",f:"Anong best machine dito?",e:"Let's keep in touch."},
+      ]
+    },
+    event:{
+      neutral:[
+        {p:"First time mo sa event na to?",f:"Kilala mo organizer?",e:"Enjoy the event!"},
+        {p:"Okay turnout ah.",f:"Ikaw rin first time?",e:"Nice talking."},
+        {p:"Solid crowd ah.",f:"Kilala mo ba yung mga tao?",e:"Enjoy!"},
+      ],
+      friend:[
+        {p:"Sino invite sa iyo?",f:"Okay ba event?",e:"Let's hang again."},
+        {p:"Kilala mo ba ibang tao dito?",f:"Kamusta mga tao?",e:"In touch."},
+        {p:"Sino pa kasama mo?",f:"Okay ba sila?",e:"See you."},
+      ],
+      date:[
+        {p:"Di ba maganda event na to? Glad ka na nandito ka?",f:"Anong pinaka-bet mo dito?",e:"Sana ulit."},
+        {p:"Ang daming tao pero nakita kita.",f:"Kilala ka ba ng marami dito?",e:"Nice talking."},
+        {p:"Maganda yung setup nila ah.",f:"Dito ka lagi for events?",e:"Ikaw ang mag-message."},
+      ],
+      bro:[
+        {p:"Bro solid event to.",f:"Libre ba lahat bro?",e:"Bro laban."},
+        {p:"Uy bro tara libre food.",f:"Saan yung food bro?",e:"Solid bro."},
+        {p:"Uy bro solid crowd.",f:"Kilala mo ba ibang tao?",e:"See you bro."},
+      ],
+      network:[
+        {p:"What industry are you in?",f:"How long have you been in it?",e:"Let's connect on LinkedIn."},
+        {p:"What brought you to this event?",f:"What are you hoping to get out of this?",e:"Nice to meet you."},
+        {p:"Are you speaking here or just attending?",f:"What's your role?",e:"Let's keep in touch."},
+      ]
+    },
+    transport:{
+      neutral:[
+        {p:"Papunta ka rin sa city?",f:"Ilang oras pa trip?",e:"Safe travels."},
+        {p:"First time mo sa route na to?",f:"Saan ka bababa?",e:"Take care."},
+        {p:"Lagi ka ba sa route na to?",f:"Okay ba schedule nila?",e:"Enjoy the ride."},
+      ],
+      friend:[
+        {p:"Tara sabay?",f:"Saan ka exactly punta?",e:"Chat tayo."},
+        {p:"Uy kasama ka rin?",f:"Ilang oras ba trip?",e:"In touch."},
+      ],
+      date:[
+        {p:"Commute ka rin? Mismo.",f:"Saan ka punta?",e:"Sana ulit."},
+        {p:"Matagal ba trip mo?",f:"Okay ka?",e:"Take care ha."},
+      ],
+      bro:[
+        {p:"Bro papunta ka rin?",f:"Tara sabay bro.",e:"Solid bro."},
+      ],
+      network:[
+        {p:"Do you commute often?",f:"Where are you headed?",e:"Nice to meet you."},
+      ]
+    },
+    market:{
+      neutral:[
+        {p:"Lagi ka ba dito?",f:"Kilala mo ba mga vendor dito?",e:"Enjoy shopping."},
+        {p:"Masaya pala ang market ngayon.",f:"Anong hinahanap mo?",e:"Take care."},
+        {p:"Crowded ngayon ah.",f:"Lagi ba ganito?",e:"See you around."},
+      ],
+      friend:[
+        {p:"Ano ginagawa mo dito?",f:"Regular ka ba?",e:"Let's hang."},
+        {p:"Alam mo bang may magandang tindahan dito?",f:"Anong bet mo?",e:"Chat tayo."},
+      ],
+      date:[
+        {p:"Nagha-haggle ka ba?",f:"Okay ka ba dito?",e:"Nice talking."},
+      ],
+      bro:[
+        {p:"Bro maganda items dito.",f:"Ano hinahanap mo bro?",e:"Solid bro."},
+      ],
+      network:[
+        {p:"Are you a vendor here?",f:"How long have you been here?",e:"Nice to meet you."},
+      ]
+    },
+    beach:{
+      neutral:[
+        {p:"First time mo dito?",f:"Anong bet mo sa beach na to?",e:"Enjoy the sun."},
+        {p:"Maganda pala beach na to.",f:"Lagi ka ba dito?",e:"Have a great time."},
+        {p:"Chill vibe dito ah.",f:"Tagal ka pa ba?",e:"Take care."},
+      ],
+      friend:[
+        {p:"Lagi ka ba dito?",f:"Anong best spot para maligo?",e:"Let's go again."},
+        {p:"Alam mo ba anong magandang kain dito?",f:"Okay ba food?",e:"In touch."},
+      ],
+      date:[
+        {p:"Maganda view dito ah.",f:"Favorite mo bang beach to?",e:"Sana ulit."},
+        {p:"Okay ang sunset dito.",f:"Lagi ka ba dito?",e:"Ikaw ang mag-message."},
+      ],
+      bro:[
+        {p:"Bro laro tayo sa beach.",f:"Okay ka bro?",e:"Solid bro."},
+      ],
+      network:[
+        {p:"You work nearby?",f:"What do you do?",e:"Let's connect."},
+      ]
+    },
+    park:{
+      neutral:[
+        {p:"Chill lugar dito ah.",f:"Lagi ka ba dito?",e:"Enjoy!"},
+        {p:"Maganda parke ngayon.",f:"Anong usually ginagawa mo dito?",e:"Take care."},
+        {p:"Okay langit ngayon ah.",f:"Tagal ka pa ba?",e:"See you."},
+      ],
+      friend:[
+        {p:"Lagi ka ba dito mag-jogging?",f:"Ilang rounds ka?",e:"Let's run together."},
+        {p:"Tara mag-ikot?",f:"Okay ka lang?",e:"In touch."},
+      ],
+      date:[
+        {p:"Di ba maganda parke na to?",f:"Dito ka lagi?",e:"Sana ulit."},
+        {p:"Okay vibe ng morning dito.",f:"Lagi ka ba umaga?",e:"Ikaw ang mag-message."},
+      ],
+      bro:[
+        {p:"Bro mag-ball tayo?",f:"May court ba?",e:"Solid bro."},
+      ],
+      network:[
+        {p:"Do you usually work out here?",f:"What do you do?",e:"Let's connect."},
+      ]
     }
-    if (step === 2) {
-      DB.data.settings.monthlyIncome = +document.getElementById('ob-income').value || 45000;
-    }
-    if (step === 3) {
-      const w1 = document.getElementById('ob-w1').value.trim() || 'GCash';
-      const w2 = document.getElementById('ob-w2').value.trim() || 'BDO';
-      const w3 = document.getElementById('ob-w3').value.trim() || 'Wallet';
-      DB.data.settings.wallets[0].label = w1;
-      DB.data.settings.wallets[1].label = w2;
-      DB.data.settings.wallets[2].label = w3;
-      // Update balance step labels
-      document.getElementById('ob-bal1-lbl').textContent = '💳 ' + w1;
-      document.getElementById('ob-bal2-lbl').textContent = '🏦 ' + w2;
-      document.getElementById('ob-bal3-lbl').textContent = '👛 ' + w3;
-    }
-    document.getElementById(`ob-${step}`).classList.remove('active');
-    document.getElementById(`ob-${step + 1}`).classList.add('active');
-    document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === step));
   },
 
-  finish() {
-    DB.data.settings.wallets[0].opening = +document.getElementById('ob-bal1').value || 0;
-    DB.data.settings.wallets[1].opening = +document.getElementById('ob-bal2').value || 0;
-    DB.data.settings.wallets[2].opening = +document.getElementById('ob-bal3').value || 0;
-    DB.data.settings.onboarded = true;
-    DB.save();
-    document.getElementById('onboarding').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    App.boot();
+  follow:{
+    neutral:[
+      "Dito ka lagi?","Anong work mo?","Kumain ka na ba?","Matagal ka pa ba dito?","Anong trip usually?",
+      "Malapit ka ba dito?","Okay ka lang?","Ano ginagawa mo ngayon?","Lagi ka ba ganito?","Anong usually schedule mo?",
+      "Kilala mo ba lugar to?","Anong best spot dito?","May kasama ka ba?","Anong bet mo dito?","Tagal ka pa?",
+    ],
+    friend:[
+      "Anong pinaka-favorite mo dito?","Sino kasama mo today?","Plano mo pa ba ulit?","Anong usually ginagawa mo after?",
+      "Okay ba trip mo?","Saan kayo after?","Kilala mo ba ibang tao?","Lagi ba kayong ganito?",
+      "Paano kayo nagkakilala?","Anong pinaka-memorable na experience niyo?","Anong bet mong gawain?",
+      "Saan ka madalas pumunta?","May plano ka ba weekend?","Anong show pinapanood mo ngayon?",
+      "Anong pinaka-enjoy mong ginawa recently?",
+    ],
+    date:[
+      "Anong pinaka-bet mo sa lugar na to?","Ano ka ginagawa mo free time?","Chill ka ah, I like that.",
+      "Lagi ka ba ganito?","Gusto mo ba tong kind of place?","Do you usually come alone?",
+      "What's your favorite thing about this place?","Are you usually this relaxed?",
+      "You seem like you know this spot well.","How often do you come here?","What do you usually do on weekends?",
+      "Anong bet mong oras ng araw?","What's your go-to when you need to unwind?","You seem like a regular here.",
+      "What made you choose this place today?",
+    ],
+    bro:[
+      "Bro anong crack?","Anong balak mo after?","Bro sama ka sa susunod.","Bro anong pinaka-bet mong spot dito?",
+      "Bro okay ka?","Sino kasama mo?","Anong project mo ngayon bro?","Bro anong trip?","Anong balak mo bukas?",
+      "Bro kailan ka libre?","Anong ginagawa mo after?","Tara bro?","Bro okay ba life?","Anong balak mo mamaya?",
+      "Bro saan ka after?",
+    ],
+    network:[
+      "What do you do for work?","Are you based here?","What are you working on lately?","How long have you been in the industry?",
+      "What's your role?","How did you get into this field?","What's the biggest challenge in your work right now?",
+      "Do you often attend these kinds of events?","What's your take on the industry right now?",
+      "Are you working on any interesting projects?","How did you get started?","What does your team look like?",
+      "What trends are you keeping an eye on?","Who do you usually collaborate with?","What does success look like for you right now?",
+    ]
+  },
+
+  hook:{
+    neutral:[
+      "Weird question pero — ano pinaka-random skill mo?","If you weren't here, where would you be right now?",
+      "Best advice you ever ignored?","Anong pinaka-underrated na lugar dito?","Kung malaya ka bukas, ano gagawin mo?",
+      "Ano ang pinaka-masayang ginawa mo ngayong taon?","Anong lagi mong pinagsisisihan?",
+      "Ano ang pinaka-bet mong oras ng araw?","Kung pwede kang magtrabaho kahit saan, saan?",
+      "Anong bagay na hindi mo pa nagagawa na gusto mo?","Anong pinaka-bold na decision mo?",
+      "Anong trip na hindi mo malilimutan?","Kung may second career ka, ano?",
+      "Anong bagay na hindi mo expected na ma-enjoy mo?","Anong pinaka-weird na habit mo?",
+    ],
+    friend:[
+      "Anong pinaka-memorable na trip mo?","Kung malaya ka bukas, ano gagawin mo?","Anong show pinapanood mo ngayon?",
+      "Anong pinaka-dumb na desisyon mo na hindi ka nagsisi?","Anong pinaka-random na bagay na nagustuhan mo?",
+      "Sino pinaka-interesting na tao na nakilala mo?","Anong pinaka-scary na ginawa mo?",
+      "Kung mapapili ka ng kahit saang bansa, saan?","Anong bet mong part ng buhay mo ngayon?",
+      "Ano kaya ang masasabi ng 10-year-old na ikaw sa iyo ngayon?","Anong pinaka-underrated na TV show?",
+      "Kung ikaw yung host ng talk show, sino guest mo?","Anong superpower ang bet mo?",
+      "Anong kain na hindi mo tinikman na gusto mo subukan?","Anong lagi mong regret?",
+    ],
+    date:[
+      "What's something people always get wrong about you?","Anong pinaka-underrated na bagay sa buhay mo?",
+      "If you could only eat one food forever, what would it be?","What's the most spontaneous thing you've done?",
+      "What's a weird thing that makes you happy?","What's your love language?",
+      "If your life was a movie genre, what would it be?","What do you miss most about being a kid?",
+      "What's a skill you secretly want to learn?","What's the best compliment you've ever gotten?",
+      "What was your childhood dream job?","What's something you're proud of that nobody knows?",
+      "If you had to live in another era, when?","What's your version of a perfect day?",
+      "What's a dealbreaker for you in a person?",
+    ],
+    bro:[
+      "Bro kung walang pera limitasyon, ano gagawin mo?","Anong pinaka-dumb risk na ginawa mo na nag-work?",
+      "Bro kung may superpower ka, ano?","Anong pinaka-memorable na trip mo bro?",
+      "Bro anong pinaka-bold na ginawa mo?","Bro, kung ikaw si president, unang gagawin mo?",
+      "Bro, may gusto ka bang subukan pero hindi mo pa?","Anong pinaka-epic na gabi niyo ng barkada?",
+      "Bro, anong pinaka-scary na ginawa mo?","Bro, anong ginagawa mo kung unlimited vacation?",
+      "Bro, sino ang pinaka-solid na tao sa buhay mo?","Anong movie na paulit-ulit mong napapanood?",
+      "Bro, kung may time machine ka, saan ka pupunta?","Kung maglaro ka ng last game, anong laro?",
+      "Bro, anong pinaka-epic na desisyon mo?",
+    ],
+    network:[
+      "What's the best business advice you've gotten?","What are you learning right now?",
+      "What's a problem in your industry nobody talks about?","What would you do differently if you started over?",
+      "What's the best investment you've made — in anything?","What's an assumption in your field you think is wrong?",
+      "What skill do you think is underrated in your industry?","What's the one thing that changed how you work?",
+      "Who's been the biggest influence on your career?","What trend do you think people are sleeping on?",
+      "What does success look like to you right now?","What's the hardest decision you've made in your career?",
+      "What would you tell someone just starting out?","What's something you wish you knew earlier?",
+      "What's the most important thing in your team culture?",
+    ]
+  },
+
+  exit:{
+    neutral:[
+      "Enjoy your time.","Nice talking.","See you around.","Take care ha.","Good one, ingat.",
+      "Sige, enjoy!","Nice meeting you.","Salamat sa usap.","Ingat ka.","Sige, see you.",
+      "Have a great day.","Take care.","Nice one, sige.","Enjoy the rest!","Good luck ha.",
+    ],
+    friend:[
+      "Ayos, let's hang again soon.","Add mo ko sa socials.","Nice ka pala, saan ka usually?","Sige, in touch tayo.",
+      "Chat tayo.","Let's hang ulit.","Next time sabay tayo.","Sige, HMU.","Let's do this again.",
+      "Text mo ko.","Nice, sige.","Ayos, see you sa next one.","Nice talking, in touch.",
+      "Sige, tagal na din nating d2nag-usap.","Kumpleto na friends list ko — kidding. Add mo ko.",
+    ],
+    date:[
+      "Nice talking to you, really.","Sana ulit tayo mag-usap.","Take care ha? Ikaw ang mag-message.",
+      "Solid, hope I see you again.","You made this interesting.","Glad I talked to you.",
+      "This was nice.","Ikaw ang mag-message ha.","Don't be a stranger.",
+      "Hope we cross paths again.","This was really good. Take care.","You're easy to talk to.",
+      "Until next time.","I hope I see you again.","Message mo ko ha.",
+    ],
+    bro:[
+      "Bro solid ka, sige laban.","Uy bro, next time sama ka.","Bro take care, in touch tayo.",
+      "Bro solid, see you around.","Bro laban!","In touch bro.","See you bro.","Solid bro.",
+      "Bro, good talk.","Take care bro.","Bro, you're solid.","Next time bro.",
+      "Bro ingat.","Sige bro, in touch.","Bro, see you sa next one.",
+    ],
+    network:[
+      "Let's connect on LinkedIn.","I'll send you a message.","Nice to meet you, let's keep in touch.",
+      "I'll follow up — great to connect.","Here's my card.","Let me know how that project goes.",
+      "Really enjoyed this conversation.","Let's set up a call soon.","I'll send you that link.",
+      "Great meeting you.","Let's grab coffee sometime.","I'll reach out this week.",
+      "This was really valuable, thank you.","Let's stay connected.","I'll drop you a message.",
+    ]
   }
 };
 
-// ── APP ─────────────────────────────────────
-const App = {
-  _currentPage: 'home',
-
-  boot() {
-    this.updateGreeting();
-    Home.render();
-    DB.checkAutoSync();
-    this._checkRecurring();
-  },
-
-  navTo(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    const ni = document.getElementById('nav-' + page);
-    if (ni) ni.classList.add('active');
-    this._currentPage = page;
-    const fab = document.getElementById('main-fab');
-    // cash in/out are embedded in summary cards, no FAB to hide
-    if (page === 'home')     Home.render();
-    if (page === 'ledger')   Ledger.render();
-    if (page === 'charts')   Charts.render();
-    if (page === 'mind')     Mind.render();
-    if (page === 'settings') Settings.render();
-  },
-
-  refreshAll() {
-    if (this._currentPage === 'home')   Home.render();
-    if (this._currentPage === 'ledger') Ledger.render();
-    if (this._currentPage === 'charts') Charts.render();
-    if (this._currentPage === 'mind')   Mind.render();
-  },
-
-  updateGreeting() {
-    const name = DB.data.settings.userName?.split(' ')[0] || '';
-    const h = new Date().getHours();
-    const g = h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening';
-    const el = document.querySelector('.hdr-logo');
-    if (el && name) el.title = `Good ${g}, ${name}`;
-  },
-
-  openSearch() {
-    document.getElementById('global-search').value = '';
-    document.getElementById('search-results').innerHTML = '';
-    U.openModal('search-overlay');
-    setTimeout(() => document.getElementById('global-search')?.focus(), 120);
-  },
-
-  runSearch() {
-    const q = document.getElementById('global-search').value.toLowerCase().trim();
-    const el = document.getElementById('search-results');
-    if (!q) { el.innerHTML = ''; return; }
-    const results = DB.data.transactions
-      .filter(t => !t.deleted && (t.category + t.note + t.amount + '').toLowerCase().includes(q))
-      .slice(0, 25);
-    el.innerHTML = results.length
-      ? results.map(t => Entry.txnRow(t)).join('')
-      : '<div class="empty"><div class="empty-txt">No results found</div></div>';
-  },
-
-  _checkRecurring() {
-    const m = U.thisMonth();
-    DB.data.transactions.filter(t => !t.deleted && t.recurring).forEach(t => {
-      const already = DB.data.transactions.find(x => x.recurParent === t.id && x.date.startsWith(m));
-      if (!already && !t.date.startsWith(m)) {
-        const draft = { ...t, id: U.uid(), date: U.today(), createdAt: new Date().toISOString(), recurParent: t.id, changelog: [{ action: 'auto-recurring', at: new Date().toISOString() }] };
-        delete draft.recurring;
-        DB.data.transactions.unshift(draft);
-      }
-    });
-    DB.save();
-  }
+const TIPS={
+  opener:["Observe first, speak second.","Match their energy, not your nervousness.","Short is sharp — one line beats a monologue.","Ask, don't perform.","Pause after they answer.","Eye contact + slight smile before you speak.","Less is more. Say one thing, stop.","Read the room before you step in.","Genuine curiosity beats clever lines.","Relax your shoulders before approaching.","Be interested, not interesting.","Start small. Let them expand it.","Speak slowly. Calm is attractive.","Don't rehearse — listen and react.","The best opener? Just be present."],
+  follow:["Build on what they said.","Lean in — show you're listening.","Echo their keywords back.","Less talking, more letting them talk.","Ask one question, not three.","Wait for the whole answer before responding.","React genuinely — no scripted replies.","Share something real after they share.","Don't fill silences immediately.","Match their depth of answer.","Nod and follow — don't redirect yet.","Good follow-ups make people feel heard.","Ask how, not just what.","Go deeper, not wider.","Make it a conversation, not an interview."],
+  hook:["Unexpected questions break autopilot.","Smile before the question lands.","Wait — their pause is them thinking.","Be genuinely curious.","Share your answer too — it's not an interrogation.","Weird questions get real answers.","Let silence sit. Don't rush to fill it.","React to their answer authentically.","Follow their energy — don't push.","A good hook creates a moment.","Be okay with surprising yourself.","Lead with curiosity, not cleverness.","The best hooks are ones you're actually curious about.","Don't perform the question — mean it.","Hooks work when you're calm enough to hear the answer."],
+  exit:["Leave before it gets awkward.","End on a high.","Warm exits set up warm returns.","Smile as you go — that's what they'll remember.","Always leave them wanting more.","A clean exit is confidence.","The last thing you say matters most.","Exit with energy, not apology.","Be memorable in how you leave.","Short, warm, confident.","Don't linger — it dilutes the moment.","Say less at the end.","Match the energy of your exit to the vibe.","Be the one who ends it first.","Leave a door open — always."]
 };
 
-// ── Ledger helpers exposed globally ─────────
-function clearDateFilter() {
-  document.getElementById('date-from').value = '';
-  document.getElementById('date-to').value   = '';
-  Ledger.renderTxns();
+// ── STATE ──
+let mode="opener";
+let historyStack=[];
+let historyIdx=-1;
+let stats=JSON.parse(localStorage.getItem("gripStats_v8")||"{}");
+stats.used=stats.used||0; stats.cards=stats.cards||0;
+let favorites=JSON.parse(localStorage.getItem("gripFavs_v8")||"[]");
+
+// ── HELPERS ──
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function getPhrase(m,place,intent){
+  if(m==="opener"){
+    let pool=P.opener[place]?.[intent]||P.opener[place]?.neutral||P.opener.cafe.neutral;
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+  let pool=P[m]?.[intent]||P[m]?.neutral||[];
+  return rand(pool)||"...";
 }
-Ledger.clearDateFilter = clearDateFilter;
 
-// ── INIT ────────────────────────────────────
-DB.load();
-if (DB.data.settings.onboarded) {
-  document.getElementById('onboarding').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  App.boot();
+function buildCard(){
+  let place=document.getElementById("place").value;
+  let intent=document.getElementById("intent").value;
+  let data=getPhrase(mode,place,intent);
+  let tip=rand(TIPS[mode]||TIPS.opener);
+  let exitPool=P.exit[intent]||P.exit.neutral;
+
+  if(mode==="opener"){
+    return {phrase:data.p,tip,mode,place,intent,follow:data.f,exit:data.e};
+  }
+  if(mode==="follow"||mode==="hook"){
+    return {phrase:data,tip,mode,place,intent,exit:rand(exitPool)};
+  }
+  return {phrase:data,tip,mode,place,intent};
+}
+
+function renderCard(card,animate=true){
+  document.getElementById("cardTag").innerText=card.mode.toUpperCase();
+  document.getElementById("cardTip").innerText=card.tip;
+  document.getElementById("cardPhrase").innerText=card.phrase;
+  document.getElementById("cardCtx").innerText=card.place+" · "+card.intent;
+  document.getElementById("savedInd").classList.remove("on");
+
+  let chain=document.getElementById("cardChain");
+  chain.innerHTML="";
+  let hasChain=false;
+  if(card.follow){
+    chain.innerHTML+=`<div class="chain-row"><span class="chain-label">→ Follow</span><span class="chain-text">${card.follow}</span></div>`;
+    hasChain=true;
+  }
+  if(card.exit){
+    chain.innerHTML+=`<div class="chain-row"><span class="chain-label">→ Exit</span><span class="chain-text">${card.exit}</span></div>`;
+    hasChain=true;
+  }
+  chain.style.display=hasChain?"block":"none";
+
+  if(animate){
+    let el=document.getElementById("mainCard");
+    el.classList.remove("anim");
+    void el.offsetWidth;
+    el.classList.add("anim");
+  }
+  stopSpeak();
+}
+
+function next(){
+  if(historyIdx<historyStack.length-1) historyStack=historyStack.slice(0,historyIdx+1);
+  let card=buildCard();
+  historyStack.push(card);
+  historyIdx=historyStack.length-1;
+  stats.cards++;
+  localStorage.setItem("gripStats_v8",JSON.stringify(stats));
+  updateStats();
+  renderCard(card);
+}
+
+function prev(){
+  if(historyIdx>0){historyIdx--;renderCard(historyStack[historyIdx]);}
+  else showToast("Start of history");
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+m).classList.add("active");
+  next();
+}
+
+// ── STATS ──
+function updateStats(){
+  document.getElementById("statUsed").innerText=stats.used;
+  document.getElementById("statCards").innerText=stats.cards;
+}
+
+// ── FAVS ──
+function saveFav(){
+  if(historyIdx<0) return;
+  let card=historyStack[historyIdx];
+  if(favorites.find(f=>f.phrase===card.phrase)){showToast("Already saved!");return;}
+  stats.used++;
+  favorites.push({...card,savedAt:Date.now()});
+  localStorage.setItem("gripFavs_v8",JSON.stringify(favorites));
+  localStorage.setItem("gripStats_v8",JSON.stringify(stats));
+  updateStats();
+  document.getElementById("savedInd").classList.add("on");
+  showToast("⭐ Saved!",true);
+}
+
+function openFavs(){renderFavList();document.getElementById("favPanel").classList.add("open");}
+function closeFavs(){document.getElementById("favPanel").classList.remove("open");}
+
+function renderFavList(){
+  let list=document.getElementById("favList");
+  if(!favorites.length){
+    list.innerHTML=`<div class="fav-empty"><span>⭐</span>No saved phrases yet.<br>Tap Save on a card you like.</div>`;
+    return;
+  }
+  list.innerHTML=favorites.slice().reverse().map((f,ri)=>{
+    let i=favorites.length-1-ri;
+    let safe=f.phrase.replace(/'/g,"\\'");
+    return `<div class="fav-item">
+      <div style="flex:1">
+        <div class="fav-phrase">${f.phrase}</div>
+        <div class="fav-meta">${f.mode} · ${f.place} · ${f.intent}</div>
+      </div>
+      <div class="fav-btns">
+        <button class="fav-speak" onclick="speakText('${safe}')">🔊</button>
+        <button class="fav-del" onclick="delFav(${i})">🗑</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function delFav(i){
+  favorites.splice(i,1);
+  localStorage.setItem("gripFavs_v8",JSON.stringify(favorites));
+  renderFavList();
+}
+
+// ── SPEECH ──
+function speakText(t){
+  if(!window.speechSynthesis){showToast("TTS not supported");return;}
+  window.speechSynthesis.cancel();
+  let u=new SpeechSynthesisUtterance(t);
+  u.rate=0.9;u.pitch=1.05;u.lang="en-PH";
+  window.speechSynthesis.speak(u);
+}
+
+function speakCard(){
+  let t=document.getElementById("cardPhrase").innerText;
+  if(!t||t==="Loading...") return;
+  let btn=document.getElementById("speakFab");
+  if(window.speechSynthesis.speaking){window.speechSynthesis.cancel();btn.classList.remove("on");return;}
+  btn.classList.add("on");
+  let u=new SpeechSynthesisUtterance(t);
+  u.rate=0.9;u.pitch=1.05;u.lang="en-PH";
+  u.onend=()=>btn.classList.remove("on");
+  window.speechSynthesis.speak(u);
+}
+
+function stopSpeak(){
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  let b=document.getElementById("speakFab");
+  if(b) b.classList.remove("on");
+}
+
+// ── SWIPE on card ──
+let tx=0,ty=0;
+document.getElementById("mainCard").addEventListener("touchstart",e=>{
+  tx=e.touches[0].clientX;ty=e.touches[0].clientY;
+},{passive:true});
+document.getElementById("mainCard").addEventListener("touchend",e=>{
+  let dx=e.changedTouches[0].clientX-tx;
+  let dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)+10){
+    if(dx<-50) next();
+    else if(dx>50) prev();
+  }
+},{passive:true});
+
+// ── KEYBOARD ──
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT") return;
+  if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();next();}
+  if(e.key==="ArrowLeft") prev();
+  if(e.key==="s") saveFav();
+});
+
+// ══════════════════════════════════════════════
+// PAGE SWITCH
+// ══════════════════════════════════════════════
+function switchPage(pg){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+  if(pg==="coach"){
+    document.getElementById("pageCoach").classList.add("active");
+    document.getElementById("navCoach").classList.add("active");
+  } else {
+    document.getElementById("pageBoard").classList.add("active");
+    document.getElementById("navBoard").classList.add("active");
+  }
+}
+
+// ══════════════════════════════════════════════
+// KEYWORD BOARD
+// ══════════════════════════════════════════════
+let kbWords=[];
+let kbNative=[];
+
+function kbTap(el,eng,native){
+  kbWords.push(eng);
+  kbNative.push(native);
+  renderKbDisplay();
+  // flash feedback
+  el.style.borderColor="var(--accent)";
+  setTimeout(()=>el.style.borderColor="",300);
+}
+
+function renderKbDisplay(){
+  let disp=document.getElementById("kbDisplay");
+  let ph=document.getElementById("kbPlaceholder");
+  if(!kbWords.length){
+    disp.innerHTML='<span class="kb-placeholder" id="kbPlaceholder">Tap words below to build a phrase…</span>';
+    return;
+  }
+  disp.innerHTML=kbNative.map((n,i)=>
+    `<div class="kb-chip-out">
+      <span class="kco-native">${n}</span>
+      <span class="kco-en">${kbWords[i]}</span>
+    </div>`
+  ).join("");
+}
+
+function kbUndo(){
+  kbWords.pop();kbNative.pop();
+  renderKbDisplay();
+}
+
+function kbClear(){
+  kbWords=[];kbNative=[];
+  renderKbDisplay();
+}
+
+function kbSpeak(){
+  if(!kbNative.length){showToast("Tap words first");return;}
+  let sentence=kbNative.join(" ");
+  if(!window.speechSynthesis){showToast("TTS not available");return;}
+  window.speechSynthesis.cancel();
+  let u=new SpeechSynthesisUtterance(sentence);
+  u.rate=0.8;u.pitch=1.0;
+  // Try Filipino first, fallback gracefully
+  u.lang="fil-PH";
+  u.onerror=()=>{
+    let u2=new SpeechSynthesisUtterance(sentence);
+    u2.rate=0.8;u2.lang="en-PH";
+    window.speechSynthesis.speak(u2);
+  };
+  window.speechSynthesis.speak(u);
+  showToast("🔊 Speaking…");
+}
+
+function switchSection(btn,sec){
+  document.querySelectorAll(".kb-section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".sec-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("sec-"+sec).classList.add("active");
+  btn.classList.add("active");
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let toastTimer;
+function showToast(msg,accent=false){
+  let t=document.getElementById("toast");
+  t.innerText=msg;
+  t.className="toast show"+(accent?" acc":"");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),2000);
+}
+
+// ── INIT ──
+updateStats();
+next();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js")
+      .then(r=>console.log("SW:",r.scope))
+      .catch(e=>console.log("SW err:",e));
+  });
 }
 </script>
 </body>

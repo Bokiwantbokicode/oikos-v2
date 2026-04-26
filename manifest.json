@@ -1,26 +1,25 @@
 {
-  "name": "Oikos — Personal Economy",
-  "short_name": "Oikos",
-  "description": "Your personal finance and wellbeing tracker.",
-  "start_url": "/oikos-v2/",
-  "scope": "/oikos-v2/",
+  "name": "GRIP Social Coach",
+  "short_name": "GRIP",
+  "description": "AI-powered conversation starter coach for any situation",
+  "start_url": "./index.html",
   "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#e8ff47",
   "orientation": "portrait",
-  "background_color": "#080c0f",
-  "theme_color": "#080c0f",
+  "scope": "./",
   "icons": [
     {
-      "src": "assets/icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "categories": ["finance", "productivity", "lifestyle"]
+  ]
 }

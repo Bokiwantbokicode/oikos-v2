@@ -770,5 +770,16 @@ if (DB.data.settings.onboarded) {
   App.boot();
 }
 </script>
+
+<script>
+// Register service worker for PWA install support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+</script>
 </body>
 </html>

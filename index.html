@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#080c0f"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Oikos"/>
+<meta name="application-name" content="Oikos"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="assets/icon-192.png"/>
+<title>Oikos — Personal Economy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/main.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     ONBOARDING
+     ═══════════════════════════════════ -->
+<div class="ob-wrap" id="onboarding">
+  <div class="ob-logo">O<em>I</em>KOS</div>
+  <div class="ob-tagline">οἶκος · Personal Economy</div>
+
+  <div class="ob-step active" id="ob-1">
+    <div class="ob-q">What should we call you?</div>
+    <div class="field">
+      <input id="ob-name" type="text" placeholder="Your name…"
+        style="text-align:center;font-size:20px;font-family:var(--fd);letter-spacing:.1em"/>
+    </div>
+    <button class="btn btn-g" onclick="Ob.next(1)">Continue →</button>
+  </div>
+
+  <div class="ob-step" id="ob-2">
+    <div class="ob-q">Monthly income target</div>
+    <div class="field">
+      <input id="ob-income" type="number" placeholder="45000" inputmode="decimal"
+        style="text-align:center;font-size:24px;font-family:var(--fm)"/>
+    </div>
+    <div style="font-size:12px;color:var(--txt-3);margin-bottom:14px">Editable anytime in Settings</div>
+    <button class="btn btn-g" onclick="Ob.next(2)">Continue →</button>
+  </div>
+
+  <div class="ob-step" id="ob-3">
+    <div class="ob-q">Name your wallets</div>
+    <div class="field"><div class="field-label">💳 E-Wallet (GCash, Maya…)</div>
+      <input id="ob-w1" type="text" placeholder="GCash"/>
+    </div>
+    <div class="field"><div class="field-label">🏦 Bank Account</div>
+      <input id="ob-w2" type="text" placeholder="BDO"/>
+    </div>
+    <div class="field"><div class="field-label">👛 Physical Cash</div>
+      <input id="ob-w3" type="text" placeholder="Wallet"/>
+    </div>
+    <button class="btn btn-g" onclick="Ob.next(3)">Continue →</button>
+  </div>
+
+  <div class="ob-step" id="ob-4">
+    <div class="ob-q">Current balances</div>
+    <div style="font-size:12px;color:var(--txt-2);margin-bottom:14px">How much is in each wallet right now?</div>
+    <div class="field"><div class="field-label" id="ob-bal1-lbl">💳 E-Wallet</div>
+      <input id="ob-bal1" type="number" placeholder="0" inputmode="decimal"
+        style="font-family:var(--fm);font-size:16px"/>
+    </div>
+    <div class="field"><div class="field-label" id="ob-bal2-lbl">🏦 Bank</div>
+      <input id="ob-bal2" type="number" placeholder="0" inputmode="decimal"
+        style="font-family:var(--fm);font-size:16px"/>
+    </div>
+    <div class="field"><div class="field-label" id="ob-bal3-lbl">👛 Cash</div>
+      <input id="ob-bal3" type="number" placeholder="0" inputmode="decimal"
+        style="font-family:var(--fm);font-size:16px"/>
+    </div>
+    <button class="btn btn-g" onclick="Ob.finish()">Enter Oikos →</button>
+  </div>
+
+  <div class="ob-dots" id="ob-dots">
+    <div class="ob-dot active"></div>
+    <div class="ob-dot"></div>
+    <div class="ob-dot"></div>
+    <div class="ob-dot"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     APP SHELL
+     ═══════════════════════════════════ -->
+<div id="app" style="display:none">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div>
+      <div class="hdr-logo">O<em>I</em>KOS</div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-sync">
+        <div class="sync-dot" id="sync-dot"></div>
+        <span id="sync-lbl"></span>
+      </div>
+      <div class="ico-btn" id="search-btn" onclick="App.openSearch()" title="Search">🔍</div>
+      <div class="ico-btn" onclick="App.navTo('settings')" title="Settings">⚙️</div>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="pages">
+
+    <!-- ══ HOME ══ -->
+    <div class="page active" id="page-home">
+      <div id="home-quote"></div>
+      <div id="wallet-section-wrap"></div>
+      <div class="sum3" id="home-sum3"></div>
+      <div id="weekly-section"></div>
+      <div id="home-warnings"></div>
+      <div id="home-insight"></div>
+      <div class="card">
+        <div class="sec-hdr">
+          <span class="card-title" style="margin:0">Recent Activity</span>
+          <span class="sec-act" onclick="App.navTo('ledger')">All →</span>
+        </div>
+        <div id="home-activity"></div>
+      </div>
+    </div>
+
+    <!-- ══ LEDGER ══ -->
+    <div class="page" id="page-ledger">
+      <div class="tabs">
+        <div class="tab active" onclick="Ledger.switchTab('txn')">Transactions</div>
+        <div class="tab" onclick="Ledger.switchTab('people')">People</div>
+        <div class="tab" onclick="Ledger.switchTab('goals')">Goals</div>
+      </div>
+
+      <!-- TXN TAB -->
+      <div id="ltab-txn">
+        <div class="search-bar">
+          <span class="s-ico">🔍</span>
+          <input id="txn-search" type="text" placeholder="Search transactions…" oninput="Ledger.renderTxns()"/>
+          <button class="s-clr" onclick="document.getElementById('txn-search').value='';Ledger.renderTxns()">×</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center">
+          <div class="field" style="flex:1;margin:0">
+            <input type="date" id="date-from" style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-m);padding:7px 10px;width:100%;font-size:12px;color:var(--txt)" onchange="Ledger.renderTxns()" placeholder="From"/>
+          </div>
+          <span style="color:var(--txt-3);font-size:12px">→</span>
+          <div class="field" style="flex:1;margin:0">
+            <input type="date" id="date-to" style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-m);padding:7px 10px;width:100%;font-size:12px;color:var(--txt)" onchange="Ledger.renderTxns()" placeholder="To"/>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="Ledger.clearDateFilter()">Clear</button>
+        </div>
+        <div id="wallet-filter-badge" style="display:none;margin-bottom:8px">
+          <span class="chip on" onclick="Ledger.clearWalletFilter()" id="wallet-filter-badge"></span>
+        </div>
+        <div id="txn-list"></div>
+      </div>
+
+      <!-- PEOPLE TAB -->
+      <div id="ltab-people" style="display:none">
+        <button class="btn btn-ghost" style="margin-bottom:10px;font-size:13px" onclick="Ledger.openAddPerson()">+ Add Person</button>
+        <div id="people-list"></div>
+      </div>
+
+      <!-- GOALS TAB -->
+      <div id="ltab-goals" style="display:none">
+        <div class="tabs">
+          <div class="tab active" onclick="Ledger.switchGoalsView('list')">List</div>
+          <div class="tab" onclick="Ledger.switchGoalsView('calendar')">Calendar</div>
+        </div>
+        <button class="btn btn-ghost" style="margin-bottom:10px;font-size:13px" onclick="Ledger.openAddGoal()">+ Add Goal / Anticipated Expense</button>
+        <div id="goals-content"></div>
+      </div>
+    </div>
+
+    <!-- ══ CHARTS ══ -->
+    <div class="page" id="page-charts">
+      <div class="tabs">
+        <div class="tab active" onclick="Charts.switchTab('monthly')">Monthly</div>
+        <div class="tab" onclick="Charts.switchTab('weekly')">Weekly</div>
+        <div class="tab" onclick="Charts.switchTab('daily')">Daily</div>
+      </div>
+      <div id="charts-content"></div>
+    </div>
+
+    <!-- ══ MIND ══ -->
+    <div class="page" id="page-mind">
+      <div class="tabs">
+        <div class="tab active" onclick="Mind.switchTab('focus')">Focus</div>
+        <div class="tab" onclick="Mind.switchTab('journal')">Journal</div>
+        <div class="tab" onclick="Mind.switchTab('vault')">Vault</div>
+      </div>
+      <div id="mind-content"></div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="page" id="page-settings">
+      <div style="font-family:var(--fd);font-size:12px;letter-spacing:.14em;color:var(--txt-3);margin-bottom:14px;text-transform:uppercase">Configuration</div>
+
+      <div class="card">
+        <div class="card-title">Profile</div>
+        <div class="set-item">
+          <span class="set-lbl">Your Name</span>
+          <input id="cfg-name" type="text" style="background:transparent;color:var(--txt);font-size:13px;text-align:right;width:150px;border:none;outline:none" onchange="Settings.save('userName',this.value)"/>
+        </div>
+        <div class="set-item">
+          <span class="set-lbl">Monthly Income Target</span>
+          <input id="cfg-income" type="number" style="background:transparent;color:var(--green);font-family:var(--fm);font-size:13px;text-align:right;width:100px;border:none;outline:none" onchange="Settings.save('monthlyIncome',+this.value)"/>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Wallets</div>
+        <div id="wallet-editor"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Expense Categories</div>
+        <div id="cat-editor"></div>
+        <button class="btn btn-ghost" style="margin-top:8px;font-size:13px" onclick="Settings.addCat()">+ Add Category</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">GitHub Sync</div>
+        <div class="field"><div class="field-label">Personal Access Token</div>
+          <input id="cfg-token" type="password" placeholder="ghp_…" onchange="Settings.save('ghToken',this.value)"/>
+        </div>
+        <div class="field"><div class="field-label">Repository (owner/repo)</div>
+          <input id="cfg-repo" type="text" placeholder="username/oikos-data" onchange="Settings.save('ghRepo',this.value)"/>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="Settings.testGitHub()">Test Connection</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="Settings.syncNow()">Sync Now</button>
+        </div>
+        <div style="font-size:11px;color:var(--txt-3)" id="last-sync-lbl"></div>
+        <div class="set-item" style="margin-top:10px">
+          <div>
+            <div class="set-lbl">Sync Journal & Vault</div>
+            <div style="font-size:11px;color:var(--txt-3)">Off = stays local only</div>
+          </div>
+          <div class="toggle" id="cfg-journal-toggle" onclick="Settings.toggleJournalSync()"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Data</div>
+        <div class="set-item">
+          <span class="set-lbl">Export CSV</span>
+          <button class="btn btn-ghost btn-sm" onclick="Settings.exportCSV()">Export</button>
+        </div>
+        <div class="set-item">
+          <span class="set-lbl">Export JSON</span>
+          <button class="btn btn-ghost btn-sm" onclick="Settings.exportJSON()">Export</button>
+        </div>
+        <div class="set-item">
+          <span class="set-lbl" style="color:var(--red)">Clear All Data</span>
+          <button class="btn btn-r btn-sm" onclick="Settings.clearData()">Clear</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;font-size:11px;color:var(--txt-3);margin-top:20px;font-family:var(--fd);letter-spacing:.12em">OIKOS v2 · οἶκος</div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <div class="nav">
+    <div class="nav-i active" id="nav-home" onclick="App.navTo('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+    </div>
+    <div class="nav-i" id="nav-ledger" onclick="App.navTo('ledger')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Ledger
+    </div>
+    <div class="nav-i" id="nav-charts" onclick="App.navTo('charts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Charts
+    </div>
+    <div class="nav-i" id="nav-mind" onclick="App.navTo('mind')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Mind
+    </div>
+  </div>
+
+  <!-- No FAB: Cash In/Out are in the summary cards -->
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════
+     MODALS
+     ═══════════════════════════════════ -->
+
+<!-- ENTRY -->
+<div class="overlay" id="entry-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('entry-overlay')">×</div>
+  <div class="m-title" id="entry-title">New Entry</div>
+
+  <div class="type-sel">
+    <div class="type-btn sel-out" data-type="out" onclick="Entry.setType('out')"><span class="ti">💸</span>Cash Out</div>
+    <div class="type-btn" data-type="in"  onclick="Entry.setType('in')"><span class="ti">💰</span>Cash In</div>
+    <div class="type-btn" data-type="xfr" onclick="Entry.setType('xfr')"><span class="ti">🔄</span>Transfer</div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Amount (₱)</div>
+    <input id="e-amount" type="number" placeholder="0.00" inputmode="decimal"
+      style="font-size:22px;font-family:var(--fm)" oninput="Entry.onAmountChange()"/>
+  </div>
+
+  <!-- Cash In / Out: single wallet chip selector -->
+  <div id="e-cash-wallet-wrap">
+    <div class="field-label" id="e-cash-wallet-label"
+      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
+      Pay from
+    </div>
+    <div class="chip-grid" id="e-cash-wallet-chips" style="margin-bottom:12px"></div>
+  </div>
+
+  <!-- Transfer: from + to wallet chip selectors -->
+  <div id="e-xfr-wallet-wrap" style="display:none">
+    <div class="field-label"
+      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
+      From Wallet
+    </div>
+    <div class="chip-grid" id="e-wallet-chips" style="margin-bottom:10px"></div>
+    <div class="field-label"
+      style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">
+      To Wallet
+    </div>
+    <div class="chip-grid" id="e-to-wallet-chips" style="margin-bottom:12px"></div>
+  </div>
+
+  <div id="e-cat-wrap">
+    <div class="field">
+      <div class="field-label">Category</div>
+      <select id="e-category"></select>
+    </div>
+  </div>
+
+  <div id="e-nec-wrap">
+    <div class="field-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">Necessity</div>
+    <div class="chip-grid" style="margin-bottom:10px">
+      <div class="chip on" data-nec="needed"   onclick="Entry.setNec(this)">✅ Needed</div>
+      <div class="chip"    data-nec="avoid"    onclick="Entry.setNec(this)">⚠️ Could Avoid</div>
+      <div class="chip"    data-nec="wasteful" onclick="Entry.setNec(this)">❌ Wasteful</div>
+    </div>
+  </div>
+
+  <div id="e-mood-wrap">
+    <div class="field-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:2px">How are you feeling?</div>
+    <div class="mood-row">
+      <button class="mood-btn" data-mood="😊" onclick="Entry.setMood(this)">😊</button>
+      <button class="mood-btn" data-mood="😐" onclick="Entry.setMood(this)">😐</button>
+      <button class="mood-btn" data-mood="😩" onclick="Entry.setMood(this)">😩</button>
+      <button class="mood-btn" data-mood="😤" onclick="Entry.setMood(this)">😤</button>
+      <button class="mood-btn" data-mood="😰" onclick="Entry.setMood(this)">😰</button>
+      <button class="mood-btn" data-mood="🥳" onclick="Entry.setMood(this)">🥳</button>
+    </div>
+  </div>
+
+  <div id="e-person-wrap">
+    <div class="field">
+      <div class="field-label">Link to Person (optional)</div>
+      <select id="e-person" onchange="Entry._onPersonChange()"></select>
+    </div>
+  </div>
+
+  <div id="e-share-wrap" style="display:none">
+    <div class="field">
+      <div class="field-label">Their Share (₱)</div>
+      <input id="e-share" type="number" placeholder="0.00" inputmode="decimal" oninput="Entry._updateShareHint()"/>
+      <div style="font-size:11px;color:var(--txt-3);margin-top:3px" id="e-share-hint"></div>
+    </div>
+  </div>
+
+  <div id="e-goal-wrap">
+    <div class="field">
+      <div class="field-label">Link to Goal (optional)</div>
+      <select id="e-goal"></select>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Note</div>
+    <input id="e-note" type="text" placeholder="What was this for?"/>
+  </div>
+
+  <div class="field">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="field-label" style="margin:0">Recurring Monthly</div>
+      <div class="toggle" id="e-recur-toggle" onclick="Entry.toggleRecur()"></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Receipt Photo (optional)</div>
+    <button class="btn btn-ghost" style="font-size:12px;padding:9px" onclick="document.getElementById('e-photo-input').click()">📷 Choose / Take Photo</button>
+    <input type="file" id="e-photo-input" accept="image/*" capture="environment" style="display:none" onchange="Entry.handlePhoto(this)"/>
+    <div id="e-photo-preview"></div>
+  </div>
+
+  <div id="e-breath-hint" style="display:none;text-align:center;padding:10px;background:var(--green-s);border:1px solid var(--green-g);border-radius:var(--r-m);margin-bottom:10px;font-size:12px;color:var(--green)">
+    💭 Large purchase — pause and reflect. Is this something you truly need right now?
+  </div>
+
+  <button class="btn btn-g" onclick="Entry.save()" style="margin-top:6px">Save Entry</button>
+  <button class="btn btn-ghost" onclick="U.closeModal('entry-overlay')" style="margin-top:8px">Cancel</button>
+</div>
+</div>
+
+<!-- MONTH LIST -->
+<div class="overlay" id="month-list-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('month-list-overlay')">×</div>
+  <div class="m-title" id="month-list-title">Transactions</div>
+  <div id="month-list-body"></div>
+</div>
+</div>
+
+<!-- TXN DETAIL -->
+<div class="overlay" id="txn-detail-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('txn-detail-overlay')">×</div>
+  <div id="txn-detail-body"></div>
+</div>
+</div>
+
+<!-- ADD PERSON -->
+<div class="overlay" id="person-add-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('person-add-overlay')">×</div>
+  <div class="m-title">Add Person</div>
+  <div class="field"><div class="field-label">Name</div><input id="p-name" type="text" placeholder="Kuya Charles"/></div>
+  <div class="field"><div class="field-label">Relationship</div>
+    <select id="p-rel">
+      <option>Family</option><option>Friend</option><option>Colleague</option><option>Other</option>
+    </select>
+  </div>
+  <button class="btn btn-g" onclick="Ledger.savePerson()">Add Person</button>
+  <button class="btn btn-ghost" onclick="U.closeModal('person-add-overlay')" style="margin-top:8px">Cancel</button>
+</div>
+</div>
+
+<!-- PERSON DETAIL -->
+<div class="overlay" id="person-detail-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('person-detail-overlay')">×</div>
+  <div id="person-detail-body"></div>
+</div>
+</div>
+
+<!-- SETTLE -->
+<div class="overlay" id="settle-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('settle-overlay')">×</div>
+  <div class="m-title" id="settle-title">Record Settlement</div>
+  <input type="hidden" id="settle-pid"/>
+  <input type="hidden" id="settle-mode"/>
+  <div style="font-size:12px;color:var(--txt-2);text-align:center;margin-bottom:12px" id="settle-bal"></div>
+  <div class="field"><div class="field-label">Amount (₱)</div>
+    <input id="settle-amount" type="number" placeholder="0.00" inputmode="decimal" style="font-size:18px;font-family:var(--fm)"/>
+  </div>
+  <div class="field"><div class="field-label">Note</div>
+    <input id="settle-note" type="text" placeholder="Cash, GCash, bank transfer…"/>
+  </div>
+  <button class="btn btn-g" onclick="Ledger.saveSettle()">Record Settlement</button>
+  <button class="btn btn-ghost" onclick="U.closeModal('settle-overlay')" style="margin-top:8px">Cancel</button>
+</div>
+</div>
+
+<!-- ADD GOAL -->
+<div class="overlay" id="goal-add-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('goal-add-overlay')">×</div>
+  <div class="m-title">Add Goal</div>
+  <div class="field"><div class="field-label">Name</div>
+    <input id="g-name" type="text" placeholder="Palawan Trip, RTX 5080, Car Maintenance…"/>
+  </div>
+  <div class="field"><div class="field-label">Category</div>
+    <select id="g-cat">
+      <option value="savings">💰 Savings</option>
+      <option value="trip">✈️ Trip / Travel</option>
+      <option value="event">🎉 Event / Birthday</option>
+      <option value="gadget">📱 Gadget</option>
+      <option value="maintenance">🔧 Maintenance</option>
+      <option value="health">🏥 Health</option>
+      <option value="hobby">🎯 Hobby / Lifestyle</option>
+      <option value="other">📌 Other</option>
+    </select>
+  </div>
+  <div class="field-row">
+    <div class="field"><div class="field-label">Target Amount (₱)</div>
+      <input id="g-target" type="number" placeholder="8000" inputmode="decimal"/>
+    </div>
+    <div class="field"><div class="field-label">Target Date</div>
+      <input id="g-date" type="date"/>
+    </div>
+  </div>
+  <div class="field"><div class="field-label">Repeats</div>
+    <select id="g-repeat">
+      <option value="">No repeat</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+  </div>
+  <div class="field"><div class="field-label">Person (for events/birthdays)</div>
+    <select id="g-person"></select>
+  </div>
+  <div class="field"><div class="field-label">Notes</div>
+    <input id="g-note" type="text" placeholder="Any details…"/>
+  </div>
+  <button class="btn btn-g" onclick="Ledger.saveGoal()">Add Goal</button>
+  <button class="btn btn-ghost" onclick="U.closeModal('goal-add-overlay')" style="margin-top:8px">Cancel</button>
+</div>
+</div>
+
+<!-- GOAL DETAIL -->
+<div class="overlay" id="goal-detail-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('goal-detail-overlay')">×</div>
+  <div id="goal-detail-body"></div>
+</div>
+</div>
+
+<!-- AI PROMPT -->
+<div class="overlay" id="prompt-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('prompt-overlay')">×</div>
+  <div class="m-title">AI Analysis Prompt</div>
+  <div style="font-size:11px;color:var(--txt-2);margin-bottom:10px">Select layers → copy → paste to AI → paste response back.</div>
+  <div class="chip-grid" id="prompt-layers">
+    <div class="chip on" data-layer="snapshot" onclick="Charts.togglePromptLayer(this)">📊 Snapshot</div>
+    <div class="chip on" data-layer="habits"   onclick="Charts.togglePromptLayer(this)">📈 Habits</div>
+    <div class="chip on" data-layer="regret"   onclick="Charts.togglePromptLayer(this)">💸 Regret</div>
+    <div class="chip on" data-layer="debts"    onclick="Charts.togglePromptLayer(this)">👥 Debts & Goals</div>
+    <div class="chip"    data-layer="journal"  onclick="Charts.togglePromptLayer(this)">📓 Journal</div>
+    <div class="chip"    data-layer="vault"    onclick="Charts.togglePromptLayer(this)">😤 Emotional</div>
+  </div>
+  <div class="report-box" id="prompt-output"></div>
+  <button class="btn btn-g" style="margin-bottom:8px" onclick="Charts.copyPrompt()">📋 Copy Prompt</button>
+  <div style="font-size:11px;font-weight:700;color:var(--txt-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Paste AI Response:</div>
+  <textarea id="ai-response-input" style="width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r-m);padding:11px;color:var(--txt);font-size:13px;min-height:100px;resize:none;line-height:1.6" placeholder="Paste the AI output here…"></textarea>
+  <button class="btn btn-ghost" style="margin-top:8px;font-size:13px" onclick="Charts.parseResponse()">Parse & Apply</button>
+  <button class="btn btn-ghost" onclick="U.closeModal('prompt-overlay')" style="margin-top:8px">Close</button>
+</div>
+</div>
+
+<!-- VENT / VAULT WRITE -->
+<div class="overlay" id="vent-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('vent-overlay')">×</div>
+  <div class="m-title">Write to the Vault</div>
+  <div style="font-size:12px;color:var(--txt-2);text-align:center;margin-bottom:12px">Say it all. This seals for 30 days.<br>You'll revisit it then.</div>
+  <div class="field">
+    <textarea id="vent-txt" style="min-height:140px" placeholder="What happened? What's frustrating you? Don't hold back…"></textarea>
+  </div>
+  <div class="field-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-2);margin-bottom:6px">Triggered by</div>
+  <div class="chip-grid" id="vent-tags">
+    <div class="chip" data-tag="Work"   onclick="Mind.toggleVentTag(this)">Work</div>
+    <div class="chip" data-tag="Money"  onclick="Mind.toggleVentTag(this)">Money</div>
+    <div class="chip" data-tag="Person" onclick="Mind.toggleVentTag(this)">Person</div>
+    <div class="chip" data-tag="Health" onclick="Mind.toggleVentTag(this)">Health</div>
+    <div class="chip" data-tag="Self"   onclick="Mind.toggleVentTag(this)">Self</div>
+    <div class="chip" data-tag="Other"  onclick="Mind.toggleVentTag(this)">Other</div>
+  </div>
+  <div class="field">
+    <div class="field-label">Intensity (1 = mild · 5 = intense)</div>
+    <input id="vent-intensity" type="range" min="1" max="5" value="3" style="width:100%;accent-color:var(--amber)"/>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt-3)"><span>Mild</span><span>Intense</span></div>
+  </div>
+  <button class="btn btn-g" style="background:linear-gradient(135deg,var(--amber),#a07010)" onclick="Mind.sealVent()">🔒 Seal for 30 Days</button>
+  <button class="btn btn-ghost" onclick="U.closeModal('vent-overlay')" style="margin-top:8px">Cancel</button>
+</div>
+</div>
+
+<!-- VAULT REVEAL -->
+<div class="overlay" id="reveal-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('reveal-overlay')">×</div>
+  <div class="m-title">🔓 Vault Unsealed</div>
+  <div style="font-size:11px;color:var(--txt-3);text-align:center;margin-bottom:12px;font-family:var(--fm)" id="reveal-date"></div>
+  <div style="background:var(--bg-3);border-radius:var(--r-m);padding:13px;margin-bottom:13px;font-size:13px;color:var(--txt);line-height:1.7;font-style:italic" id="reveal-content"></div>
+  <div style="font-size:13px;font-weight:500;margin-bottom:8px">How do you feel about this now?</div>
+  <div class="chip-grid" id="reveal-chips">
+    <div class="chip" onclick="Mind.setResolution(this,'resolved')">✅ Resolved</div>
+    <div class="chip" onclick="Mind.setResolution(this,'still')">⚠️ Still affects me</div>
+    <div class="chip" onclick="Mind.setResolution(this,'grew')">🌱 Grew from it</div>
+    <div class="chip" onclick="Mind.setResolution(this,'unresolved')">❌ Unresolved</div>
+  </div>
+  <input type="hidden" id="reveal-resolution"/>
+  <div class="field" style="margin-top:10px">
+    <div class="field-label">Reflection (optional)</div>
+    <textarea id="reveal-reflection" style="min-height:70px" placeholder="What do you think now?"></textarea>
+  </div>
+  <button class="btn btn-g" onclick="Mind.submitReveal()">Save Reflection</button>
+</div>
+</div>
+
+<!-- SEARCH -->
+<div class="overlay" id="search-overlay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-close" onclick="U.closeModal('search-overlay')">×</div>
+  <div class="m-title">Search</div>
+  <div class="search-bar" style="margin-bottom:12px">
+    <span class="s-ico">🔍</span>
+    <input id="global-search" type="text" placeholder="Amount, category, note, person…" oninput="App.runSearch()"/>
+    <button class="s-clr" onclick="document.getElementById('global-search').value='';App.runSearch()">×</button>
+  </div>
+  <div id="search-results"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script src="js/quotes.js"></script>
+<script src="js/home.js"></script>
+<script src="js/entry.js"></script>
+<script src="js/ledger.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/mind.js"></script>
+<script src="js/settings.js"></script>
+<script>
+// ═══════════════════════════════════════════
+// APP BOOT & COORDINATOR
+// ═══════════════════════════════════════════
+
+// ── ONBOARDING ──────────────────────────────
+const Ob = {
+  next(step) {
+    if (step === 1) {
+      const n = document.getElementById('ob-name').value.trim();
+      if (!n) { U.toast('Please enter your name'); return; }
+      DB.data.settings.userName = n;
+    }
+    if (step === 2) {
+      DB.data.settings.monthlyIncome = +document.getElementById('ob-income').value || 45000;
+    }
+    if (step === 3) {
+      const w1 = document.getElementById('ob-w1').value.trim() || 'GCash';
+      const w2 = document.getElementById('ob-w2').value.trim() || 'BDO';
+      const w3 = document.getElementById('ob-w3').value.trim() || 'Wallet';
+      DB.data.settings.wallets[0].label = w1;
+      DB.data.settings.wallets[1].label = w2;
+      DB.data.settings.wallets[2].label = w3;
+      // Update balance step labels
+      document.getElementById('ob-bal1-lbl').textContent = '💳 ' + w1;
+      document.getElementById('ob-bal2-lbl').textContent = '🏦 ' + w2;
+      document.getElementById('ob-bal3-lbl').textContent = '👛 ' + w3;
+    }
+    document.getElementById(`ob-${step}`).classList.remove('active');
+    document.getElementById(`ob-${step + 1}`).classList.add('active');
+    document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === step));
+  },
+
+  finish() {
+    DB.data.settings.wallets[0].opening = +document.getElementById('ob-bal1').value || 0;
+    DB.data.settings.wallets[1].opening = +document.getElementById('ob-bal2').value || 0;
+    DB.data.settings.wallets[2].opening = +document.getElementById('ob-bal3').value || 0;
+    DB.data.settings.onboarded = true;
+    DB.save();
+    document.getElementById('onboarding').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    App.boot();
+  }
+};
+
+// ── APP ─────────────────────────────────────
+const App = {
+  _currentPage: 'home',
+
+  boot() {
+    this.updateGreeting();
+    Home.render();
+    DB.checkAutoSync();
+    this._checkRecurring();
+  },
+
+  navTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    const ni = document.getElementById('nav-' + page);
+    if (ni) ni.classList.add('active');
+    this._currentPage = page;
+    const fab = document.getElementById('main-fab');
+    // cash in/out are embedded in summary cards, no FAB to hide
+    if (page === 'home')     Home.render();
+    if (page === 'ledger')   Ledger.render();
+    if (page === 'charts')   Charts.render();
+    if (page === 'mind')     Mind.render();
+    if (page === 'settings') Settings.render();
+  },
+
+  refreshAll() {
+    if (this._currentPage === 'home')   Home.render();
+    if (this._currentPage === 'ledger') Ledger.render();
+    if (this._currentPage === 'charts') Charts.render();
+    if (this._currentPage === 'mind')   Mind.render();
+  },
+
+  updateGreeting() {
+    const name = DB.data.settings.userName?.split(' ')[0] || '';
+    const h = new Date().getHours();
+    const g = h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening';
+    const el = document.querySelector('.hdr-logo');
+    if (el && name) el.title = `Good ${g}, ${name}`;
+  },
+
+  openSearch() {
+    document.getElementById('global-search').value = '';
+    document.getElementById('search-results').innerHTML = '';
+    U.openModal('search-overlay');
+    setTimeout(() => document.getElementById('global-search')?.focus(), 120);
+  },
+
+  runSearch() {
+    const q = document.getElementById('global-search').value.toLowerCase().trim();
+    const el = document.getElementById('search-results');
+    if (!q) { el.innerHTML = ''; return; }
+    const results = DB.data.transactions
+      .filter(t => !t.deleted && (t.category + t.note + t.amount + '').toLowerCase().includes(q))
+      .slice(0, 25);
+    el.innerHTML = results.length
+      ? results.map(t => Entry.txnRow(t)).join('')
+      : '<div class="empty"><div class="empty-txt">No results found</div></div>';
+  },
+
+  _checkRecurring() {
+    const m = U.thisMonth();
+    DB.data.transactions.filter(t => !t.deleted && t.recurring).forEach(t => {
+      const already = DB.data.transactions.find(x => x.recurParent === t.id && x.date.startsWith(m));
+      if (!already && !t.date.startsWith(m)) {
+        const draft = { ...t, id: U.uid(), date: U.today(), createdAt: new Date().toISOString(), recurParent: t.id, changelog: [{ action: 'auto-recurring', at: new Date().toISOString() }] };
+        delete draft.recurring;
+        DB.data.transactions.unshift(draft);
+      }
+    });
+    DB.save();
+  }
+};
+
+// ── Ledger helpers exposed globally ─────────
+function clearDateFilter() {
+  document.getElementById('date-from').value = '';
+  document.getElementById('date-to').value   = '';
+  Ledger.renderTxns();
+}
+Ledger.clearDateFilter = clearDateFilter;
+
+// ── INIT ────────────────────────────────────
+DB.load();
+if (DB.data.settings.onboarded) {
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  App.boot();
+}
+</script>
+
+<script>
+// Register service worker for PWA install support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+</script>
+</body>
+</html>

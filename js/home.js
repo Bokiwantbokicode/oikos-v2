@@ -31,20 +31,23 @@ const Home = {
       </div>`;
     }).join('');
     wrap.innerHTML = `
-      <div style="display:flex;align-items:stretch;gap:8px;margin-bottom:12px;overflow:hidden">
-        <div class="wallet-scroll" style="flex:1;margin-bottom:0">${cards}</div>
-        <button onclick="Entry.open('xfr')"
-          style="background:var(--blue-s);border:1px solid var(--blue-g);color:var(--blue);
-                 border-radius:var(--r-m);padding:6px 10px;font-size:10px;font-weight:700;
-                 letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
-                 display:flex;flex-direction:column;align-items:center;justify-content:center;
-                 gap:3px;flex-shrink:0;min-width:58px;min-height:72px">
-          <span style="font-size:18px">&#128260;</span>Transfer
+      <div style="display:flex;align-items:stretch;gap:8px;margin-bottom:12px">
+        <!-- Scrollable wallet cards only -->
+        <div class="wallet-scroll" style="flex:1;margin-bottom:0;min-width:0">${cards}</div>
+        <!-- Fixed Transfer button -->
+        <button onclick="Entry.open('xfr')" style="
+          flex-shrink:0;width:64px;min-height:76px;
+          background:var(--blue-s);border:1px solid var(--blue-g);color:var(--blue);
+          border-radius:var(--r-l);font-size:9px;font-weight:700;letter-spacing:.05em;
+          text-transform:uppercase;cursor:pointer;
+          display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+          <span style="font-size:20px">&#x1F504;</span>Transfer
         </button>
-        <div class="w-total" style="flex-shrink:0;min-width:88px;margin-bottom:0">
+        <!-- Fixed Total -->
+        <div class="w-total" style="flex-shrink:0;width:80px;min-height:76px;margin-bottom:0;display:flex;flex-direction:column;justify-content:center">
           <div class="w-icon">&#8721;</div>
           <div class="w-lbl">Total</div>
-          <div class="w-amt">${U.fmtShort(total)}</div>
+          <div class="w-amt" style="font-size:14px">${U.fmtShort(total)}</div>
         </div>
       </div>`;
   },
@@ -60,39 +63,48 @@ const Home = {
     const net = inn - out;
     const label = new Date().toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
     el.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <!-- Cash In + Cash Out: equal width, full row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
 
-        <!-- Cash In — action button -->
-        <button onclick="Entry.open('in')"
-          style="background:var(--green-s);border:1px solid var(--green-g);border-radius:var(--r-l);
-                 padding:14px 10px;cursor:pointer;text-align:center;transition:all .18s;width:100%"
-          onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--green-g)'">
-          <div style="font-size:22px;margin-bottom:4px">💰</div>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:4px">Cash In</div>
-          <div style="font-family:var(--fm);font-size:16px;font-weight:600;color:var(--green)">${U.fmtShort(inn)}</div>
-          <div style="font-size:9px;color:var(--txt-3);margin-top:2px">${label} · tap to add</div>
+        <button onclick="Entry.open('in')" style="
+          background:var(--green-s);border:1px solid var(--green-g);
+          border-radius:var(--r-l);padding:16px 8px;cursor:pointer;
+          text-align:center;width:100%;transition:border-color .18s">
+          <div style="font-size:24px;margin-bottom:6px">💰</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.1em;color:var(--green);margin-bottom:5px">Cash In</div>
+          <div style="font-family:var(--fm);font-size:17px;font-weight:600;
+                      color:var(--green);margin-bottom:3px">${U.fmtShort(inn)}</div>
+          <div style="font-size:9px;color:var(--txt-3)">${label}</div>
         </button>
 
-        <!-- Cash Out — action button -->
-        <button onclick="Entry.open('out')"
-          style="background:var(--red-s);border:1px solid var(--red-g);border-radius:var(--r-l);
-                 padding:14px 10px;cursor:pointer;text-align:center;transition:all .18s;width:100%"
-          onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--red-g)'">
-          <div style="font-size:22px;margin-bottom:4px">💸</div>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:4px">Cash Out</div>
-          <div style="font-family:var(--fm);font-size:16px;font-weight:600;color:var(--red)">${U.fmtShort(out)}</div>
-          <div style="font-size:9px;color:var(--txt-3);margin-top:2px">${label} · tap to add</div>
+        <button onclick="Entry.open('out')" style="
+          background:var(--red-s);border:1px solid var(--red-g);
+          border-radius:var(--r-l);padding:16px 8px;cursor:pointer;
+          text-align:center;width:100%;transition:border-color .18s">
+          <div style="font-size:24px;margin-bottom:6px">💸</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.1em;color:var(--red);margin-bottom:5px">Cash Out</div>
+          <div style="font-family:var(--fm);font-size:17px;font-weight:600;
+                      color:var(--red);margin-bottom:3px">${U.fmtShort(out)}</div>
+          <div style="font-size:9px;color:var(--txt-3)">${label}</div>
         </button>
 
       </div>
 
-      <!-- Net summary bar -->
-      <div onclick="Home.showMonthList('all')"
-        style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-m);
-               padding:10px 14px;display:flex;justify-content:space-between;align-items:center;
-               cursor:pointer;margin-bottom:12px">
-        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-3)">Net ${label}</span>
-        <span style="font-family:var(--fm);font-size:15px;font-weight:600" class="${net >= 0 ? 'g' : 'r'}">${net >= 0 ? '+' : ''}${U.fmtShort(net)}</span>
+      <!-- Net: full width bar -->
+      <div onclick="Home.showMonthList('all')" style="
+        background:var(--bg-2);border:1px solid var(--border);
+        border-radius:var(--r-m);padding:11px 16px;
+        display:flex;justify-content:space-between;align-items:center;
+        cursor:pointer;margin-bottom:12px">
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.1em;color:var(--txt-3)">Net Balance</div>
+          <div style="font-size:10px;color:var(--txt-3);margin-top:1px">${label} · tap to see all</div>
+        </div>
+        <div style="font-family:var(--fm);font-size:17px;font-weight:700"
+          class="${net >= 0 ? 'g' : 'r'}">${net >= 0 ? '+' : ''}${U.fmtShort(net)}</div>
       </div>`;
   },
 

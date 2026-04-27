@@ -1,6 +1,6 @@
 // ── OIKOS v2 · sw.js ─────────────────────────
 // Bump VERSION on every deploy to bust old cache
-const VERSION = 'oikos-v2-6';
+const VERSION = 'oikos-v2-7';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
